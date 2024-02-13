@@ -8,8 +8,6 @@ div.classList.add(
   'tw-fixed',
   'tw-top-4',
   'tw-right-4',
-  'tw-px-4',
-  'tw-py-2',
   'tw-bg-zinc-100',
   'tw-drop-shadow-md',
   'tw-rounded'
