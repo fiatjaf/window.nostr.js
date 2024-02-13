@@ -3,29 +3,35 @@
   import {
     generateSecretKey,
     type VerifiedEvent,
-    type UnsignedEvent
+    type UnsignedEvent,
+    type NostrEvent
   } from 'nostr-tools/pure'
-  import {SimplePool} from 'nostr-tools/pool'
+  import {SimplePool, type SubCloser} from 'nostr-tools/pool'
   import {
     BunkerSigner,
     type BunkerSignerParams,
     createAccount,
     parseBunkerInput,
-    fetchCustodialbunkers as fetchCustodialBunkers
+    fetchCustodialbunkers as fetchCustodialBunkers,
+    type BunkerPointer
   } from 'nostr-tools/nip46'
   import {queryProfile} from 'nostr-tools/nip05'
   import {npubEncode} from 'nostr-tools/nip19'
+  import {onMount} from 'svelte'
 
   const pool = new SimplePool()
   let opened = false
   let bunkerInput: HTMLInputElement
+  let bunkerPointer: BunkerPointer | null = null
   let bunker: BunkerSigner
   let connected: null | {
     pubkey: string
     npub: string
     name?: string
     picture?: string
+    event: NostrEvent | null
   } = null
+  let metadataSub: SubCloser
 
   const bunkerSignerParams: BunkerSignerParams = {
     pool,
@@ -33,6 +39,18 @@
       console.log('auth', url)
     }
   }
+
+  onMount(() => {
+    let data = localStorage.getItem('nip46BunkerPointer')
+    if (data) {
+      bunkerPointer = JSON.parse(data)
+      connect()
+    }
+
+    return () => {
+      if (metadataSub) metadataSub.close()
+    }
+  })
 
   function handleClick(ev: MouseEvent) {
     if (ev.composedPath().find((el: any) => el.id === 'windowNostrModal'))
@@ -42,14 +60,18 @@
 
   async function handleConnect(ev: SubmitEvent) {
     ev.preventDefault()
-    let bp = await parseBunkerInput(bunkerInput.value)
-    if (!bp) {
+    bunkerPointer = await parseBunkerInput(bunkerInput.value)
+    if (!bunkerPointer) {
       bunkerInput.setCustomValidity(
         'invalid NIP-05 "name@domain.com" address or bunker:// URI'
       )
       return
     }
 
+    connect()
+  }
+
+  async function connect() {
     let clientSecret
     const local = localStorage.getItem('nip46ClientSecretKey')
     if (local) {
@@ -58,14 +80,39 @@
       clientSecret = generateSecretKey()
       localStorage.setItem('nip46ClientSecretKey', bytesToHex(clientSecret))
     }
-    bunker = new BunkerSigner(clientSecret, bp, bunkerSignerParams)
 
+    bunker = new BunkerSigner(clientSecret, bunkerPointer!, bunkerSignerParams)
     await bunker.connect()
 
     connected = {
       pubkey: bunker.remotePubkey,
-      npub: npubEncode(bunker.remotePubkey)
+      npub: npubEncode(bunker.remotePubkey),
+      event: null
     }
+
+    localStorage.setItem('nip46BunkerPointer', JSON.stringify(bunkerPointer))
+
+    metadataSub = pool.subscribeMany(
+      [
+        'wss://purplepag.es',
+        'wss://relay.snort.social',
+        'wss://relay.nos.social'
+      ],
+      [{kinds: [0], authors: [bunker.remotePubkey]}],
+      {
+        onevent(evt) {
+          if ((connected!.event?.created_at || 0) >= evt.created_at) return
+          try {
+            let {name, picture} = JSON.parse(evt.content)
+            connected!.event = evt
+            connected!.name = name
+            connected!.picture = picture
+          } catch (err) {
+            /***/
+          }
+        }
+      }
+    )
   }
 </script>
 
