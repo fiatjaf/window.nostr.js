@@ -80,6 +80,7 @@
       return
     }
 
+    bunkerInput.setCustomValidity('')
     connect()
   }
 
