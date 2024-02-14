@@ -19,3 +19,8 @@ const app = new App({
 })
 
 export default app
+
+// ~
+;(window as any).destroyWnj= () => {
+  app.$destroy()
+}

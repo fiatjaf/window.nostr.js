@@ -22,7 +22,11 @@
   let opened = false
   let bunkerInput: HTMLInputElement
   let bunkerPointer: BunkerPointer | null = null
-  let bunker: BunkerSigner
+  let resolveBunker: (_: BunkerSigner) => void
+  let bunker: Promise<BunkerSigner> = new Promise(resolve => {
+    resolveBunker = resolve
+  })
+  let connecting = false
   let connected: null | {
     pubkey: string
     npub: string
@@ -45,6 +49,15 @@
       bunkerPointer = JSON.parse(data)
       connect()
     }
+
+    setTimeout(() => {
+      if ((window as any).nostr && !(window as any).nostr.isWnj) {
+        ;(window as any).destroyWnj()
+        return
+      } else {
+        setupWindowNostr()
+      }
+    }, 3000)
 
     return () => {
       if (metadataSub) metadataSub.close()
@@ -71,6 +84,8 @@
   }
 
   async function connect() {
+    connecting = true
+
     let clientSecret
     const local = localStorage.getItem('nip46ClientSecretKey')
     if (local) {
@@ -80,9 +95,14 @@
       localStorage.setItem('nip46ClientSecretKey', bytesToHex(clientSecret))
     }
 
-    bunker = new BunkerSigner(clientSecret, bunkerPointer!, bunkerSignerParams)
+    let bunker = new BunkerSigner(
+      clientSecret,
+      bunkerPointer!,
+      bunkerSignerParams
+    )
     await bunker.connect()
 
+    // set this so the floating thing will update
     connected = {
       pubkey: bunker.remotePubkey,
       npub: npubEncode(bunker.remotePubkey),
@@ -91,6 +111,7 @@
 
     localStorage.setItem('nip46BunkerPointer', JSON.stringify(bunkerPointer))
 
+    // load metadata
     metadataSub = pool.subscribeMany(
       [
         'wss://purplepag.es',
@@ -112,6 +133,22 @@
         }
       }
     )
+
+    resolveBunker(bunker)
+  }
+
+  function setupWindowNostr() {
+    ;(window as any).nostr = {
+      isWnj: true,
+      async getPublicKey(): Promise<string> {
+        if (!connecting) opened = true
+        return (await bunker).remotePubkey
+      },
+      async signEvent(event: NostrEvent): Promise<VerifiedEvent> {
+        if (!connecting) opened = true
+        return (await bunker).signEvent(event)
+      }
+    }
   }
 </script>
 
@@ -125,6 +162,8 @@
     <div>
       connected as {connected.name || connected.npub}
     </div>
+  {:else if connecting}
+    <div>connecting to bunker</div>
   {:else}
     <div class="tw-flex tw-items-center tw-justify-center">
       {#if opened}
