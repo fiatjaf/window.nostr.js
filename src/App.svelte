@@ -3,7 +3,6 @@
   import {
     generateSecretKey,
     type VerifiedEvent,
-    type UnsignedEvent,
     type NostrEvent
   } from 'nostr-tools/pure'
   import {SimplePool, type SubCloser} from 'nostr-tools/pool'
@@ -120,7 +119,7 @@
 
 <div
   class="tw-opacity-50 hover:tw-opacity-100 tw-px-4 tw-py-2 tw-transition-all"
-  class:tw-cursor-pointer={!opened}
+  class:tw-cursor-pointer={!connected && !opened}
 >
   {#if connected}
     <div>

@@ -10,7 +10,8 @@ div.classList.add(
   'tw-right-4',
   'tw-bg-zinc-100',
   'tw-drop-shadow-md',
-  'tw-rounded'
+  'tw-rounded',
+  'tw-text-zinc-700'
 )
 
 const app = new App({
