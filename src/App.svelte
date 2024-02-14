@@ -18,23 +18,35 @@
   import {npubEncode} from 'nostr-tools/nip19'
   import {onMount} from 'svelte'
 
+  const win = window as any
   const pool = new SimplePool()
-  let opened = false
   let bunkerInput: HTMLInputElement
-  let bunkerPointer: BunkerPointer | null = null
+
+  let opened: Boolean
+  let bunkerPointer: BunkerPointer | null
   let resolveBunker: (_: BunkerSigner) => void
-  let bunker: Promise<BunkerSigner> = new Promise(resolve => {
-    resolveBunker = resolve
-  })
-  let connecting = false
+  let bunker: Promise<BunkerSigner>
+  let connecting: boolean
   let connected: null | {
     pubkey: string
     npub: string
     name?: string
     picture?: string
     event: NostrEvent | null
-  } = null
-  let metadataSub: SubCloser
+  }
+  let metadataSub: SubCloser | null
+  reset()
+
+  function reset() {
+    opened = false
+    bunkerPointer = null
+    bunker = new Promise(resolve => {
+      resolveBunker = resolve
+    })
+    connecting = false
+    connected = null
+    metadataSub = null
+  }
 
   const bunkerSignerParams: BunkerSignerParams = {
     pool,
@@ -51,11 +63,21 @@
     }
 
     setTimeout(() => {
-      if ((window as any).nostr && !(window as any).nostr.isWnj) {
-        ;(window as any).destroyWnj()
+      if (win.nostr && !win.nostr.isWnj) {
+        win.destroyWnj()
         return
       } else {
-        setupWindowNostr()
+        win.nostr = {
+          isWnj: true,
+          async getPublicKey(): Promise<string> {
+            if (!connecting) opened = true
+            return (await bunker).remotePubkey
+          },
+          async signEvent(event: NostrEvent): Promise<VerifiedEvent> {
+            if (!connecting) opened = true
+            return (await bunker).signEvent(event)
+          }
+        }
       }
     }, 3000)
 
@@ -82,6 +104,13 @@
 
     bunkerInput.setCustomValidity('')
     connect()
+  }
+
+  async function handleDisconnect(ev: MouseEvent) {
+    ev.preventDefault()
+    localStorage.removeItem('nip46BunkerPointer')
+    if (win.isWnj) delete win.nostr
+    reset()
   }
 
   async function connect() {
@@ -135,21 +164,8 @@
       }
     )
 
+    opened = false
     resolveBunker(bunker)
-  }
-
-  function setupWindowNostr() {
-    ;(window as any).nostr = {
-      isWnj: true,
-      async getPublicKey(): Promise<string> {
-        if (!connecting) opened = true
-        return (await bunker).remotePubkey
-      },
-      async signEvent(event: NostrEvent): Promise<VerifiedEvent> {
-        if (!connecting) opened = true
-        return (await bunker).signEvent(event)
-      }
-    }
   }
 </script>
 
@@ -160,9 +176,26 @@
   class:tw-cursor-pointer={!connected && !opened}
 >
   {#if connected}
-    <div>
-      connected as {connected.name || connected.npub}
+    <div class="tw-text-right">
+      {#if opened}
+        connected as
+      {/if}
+      {connected.name ||
+        connected.npub.slice(0, 7) + '…' + connected.npub.slice(-4)}
     </div>
+    {#if opened}
+      <div class="tw-my-2">
+        <a
+          target="_blank"
+          href={'https://nosta.me/' + connected.npub}
+          class="tw-no-underline tw-text-inherit tw-text-xs">{connected.npub}</a
+        >
+        <button
+          class="tw-block tw-w-full tw-mt-2 tw-px-2 tw-py-1 tw-text-sm tw-border-0 tw-bg-zinc-700 tw-hover:bg-zinc-900 tw-cursor-pointer tw-text-white"
+          on:click={handleDisconnect}>disconnect</button
+        >
+      </div>
+    {/if}
   {:else if connecting}
     <div>connecting to bunker</div>
   {:else}
@@ -175,14 +208,14 @@
       </span>
     </div>
     {#if opened}
-      <form class="tw-m-2" on:submit={handleConnect}>
+      <form class="tw-my-2" on:submit={handleConnect}>
         <input
           class="tw-px-2 tw-py-1 tw-text-lg"
           placeholder="user@provider or bunker://..."
           bind:this={bunkerInput}
         />
         <button
-          class="tw-block tw-w-full tw-mt-2 tw-px-2 tw-py-1 tw-text-lg tw-border-0 tw-bg-indigo-800 tw-hover:bg-900 tw-cursor-pointer tw-text-white"
+          class="tw-block tw-w-full tw-mt-2 tw-px-2 tw-py-1 tw-text-lg tw-border-0 tw-bg-indigo-800 tw-hover:bg-indigo-900 tw-cursor-pointer tw-text-white"
         >
           connect
         </button>
