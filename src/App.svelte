@@ -342,7 +342,7 @@
       {:else if connected}
         <div class="tw-text-center">
           <div class="tw-text-xs tw-mb-4">
-            You are currently connect to Nostr as
+            You are connected to Nostr as
           </div>
           <a
             target="_blank"
