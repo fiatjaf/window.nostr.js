@@ -26,6 +26,7 @@
   let nameInput: HTMLInputElement
   let chosenProvider: BunkerProfile | undefined
   let clientSecret: Uint8Array
+  let nip46BunkerPointer: string
   const local = localStorage.getItem('nip46ClientSecretKey')
   if (local) {
     clientSecret = hexToBytes(local)
@@ -215,6 +216,9 @@
     connecting = false
 
     localStorage.setItem('nip46BunkerPointer', JSON.stringify(bunkerPointer))
+    if (typeof bunkerPointer?.pubkey === 'string') {
+      nip46BunkerPointer = bunkerPointer?.pubkey
+    }
 
     // load metadata
     metadataSub = pool.subscribeMany(
@@ -347,10 +351,8 @@
         <!-- Connected view ################### -->
       {:else if connected}
         <div class="tw-text-center">
-          <div class="tw-text-xs tw-mb-4">You are connected to Nostr as</div>
-          <a
-            target="_blank"
-            href={'https://nosta.me/' + connected.npub}
+          <div class="tw-text-sm tw-mb-4">You are currently connect to Nostr as</div>
+          <a target="_blank" href={'https://nosta.me/' + connected.npub}
             class="tw-text-white tw-no-underline tw-group"
           >
             {#if connected.picture || connected.name}
@@ -380,6 +382,10 @@
           class="tw-block tw-w-full tw-my-2 tw-mt-6 tw-px-2 tw-py-1 tw-text-lg tw-rounded tw-border-0 tw-bg-cyan-900 hover:tw-bg-cyan-950 tw-hover:bg-indigo-900 tw-cursor-pointer tw-text-white"
           on:click={handleDisconnect}>Disconnect</button
         >
+        <div class="tw-block tw-break-all tw-mt-6 tw-text-center tw-text-sm">
+          The bunker public key is:<br/>
+          {nip46BunkerPointer}
+        </div>
       {/if}
     </div>
   {/if}
