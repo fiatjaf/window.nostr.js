@@ -60,7 +60,17 @@
     async signEvent(event: NostrEvent): Promise<VerifiedEvent> {
       if (!connecting && !connected) opened = true
       return (await bunker).signEvent(event)
-    }
+    },
+    nip04: {
+      async encrypt(pubkey: string, plaintext: string): Promise<string> {
+        if (!connecting && !connected) opened = true
+        return (await bunker).nip04Encrypt(pubkey, plaintext)
+      },
+      async decrypt(pubkey: string, ciphertext: string): Promise<string> {
+        if (!connecting && !connected) opened = true
+        return (await bunker).nip04Decrypt(pubkey, ciphertext)
+      }
+    },
   }
 
   function reset() {
