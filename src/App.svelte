@@ -20,6 +20,8 @@
   import {npubEncode} from 'nostr-tools/nip19'
   import {onMount} from 'svelte'
 
+  export let accent: string
+
   const win = window as any
   const pool = new SimplePool()
   let bunkerInput: HTMLInputElement
@@ -178,7 +180,7 @@
     creating = true
     if (providers.length === 0)
       providers = await fetchCustodialBunkers(pool, ['wss://relay.nostr.band'])
-      chosenProvider = providers[0]
+    chosenProvider = providers[0]
   }
 
   function handleOpenLogin(ev: MouseEvent) {
@@ -264,7 +266,7 @@
   <!-- Close status ################### -->
   {#if !opened}
     <div
-      class="tw-px-4 tw-py-2 tw-bg-cyan-700 hover:tw-bg-cyan-800 tw-rounded tw-cursor-pointer tw-shadow-[0_0px_10px_0px_rgba(0,0,0,0.3)]"
+      class="tw-px-4 tw-py-2 tw-bg-{accent}-700 hover:tw-bg-{accent}-800 tw-rounded tw-cursor-pointer tw-shadow-[0_0px_10px_0px_rgba(0,0,0,0.3)]"
     >
       <!-- Connecting view ################### -->
       {#if connecting}
@@ -291,11 +293,11 @@
     <!-- Open status ################### -->
   {:else}
     <div
-      class="tw-w-80 tw-px-6 tw-py-8 tw-bg-cyan-700 tw-rounded-md tw-shadow-[0_0px_30px_0px_rgba(0,0,0,0.6)] tw-transition-all tw-animate-show"
+      class="tw-w-80 tw-px-6 tw-py-8 tw-bg-{accent}-700 tw-rounded-md tw-shadow-[0_0px_30px_0px_rgba(0,0,0,0.6)] tw-transition-all tw-animate-show"
     >
       <button
         on:click={handleCloseModal}
-        class="tw-absolute tw-top-0 tw-right-0.5 tw-bg-transparent tw-border-none tw-cursor-pointer tw-text-cyan-950 tw-text-3xl"
+        class="tw-absolute tw-top-0 tw-right-0.5 tw-bg-transparent tw-border-none tw-cursor-pointer tw-text-{accent}-950 tw-text-3xl"
         >⤫</button
       >
       <!-- Create account view ################### -->
@@ -331,7 +333,7 @@
             creation; if it doesn't display check if the browser is blocking it
           </div>
           <button
-            class="tw-block tw-w-full tw-mt-4 tw-px-2 tw-py-1 tw-text-lg tw-rounded tw-border-0 tw-bg-cyan-900 hover:tw-bg-cyan-950 tw-hover:bg-indigo-900 tw-cursor-pointer tw-text-white disabled:tw-bg-neutral-400 disabled:tw-text-neutral-200 disabled:tw-cursor-default"
+            class="tw-block tw-w-full tw-mt-4 tw-px-2 tw-py-1 tw-text-lg tw-rounded tw-border-0 tw-bg-{accent}-900 hover:tw-bg-{accent}-950 tw-hover:bg-indigo-900 tw-cursor-pointer tw-text-white disabled:tw-bg-neutral-400 disabled:tw-text-neutral-200 disabled:tw-cursor-default"
             disabled={!chosenProvider || !nameInputValue}
           >
             Create »
@@ -360,7 +362,7 @@
             autofocus
           />
           <button
-            class="tw-block tw-w-full tw-mt-4 tw-px-2 tw-py-1 tw-text-lg tw-rounded tw-border-0 tw-bg-cyan-900 hover:tw-bg-cyan-950 tw-hover:bg-indigo-900 tw-cursor-pointer tw-text-white disabled:tw-bg-neutral-400 disabled:tw-text-neutral-200 disabled:tw-cursor-default"
+            class="tw-block tw-w-full tw-mt-4 tw-px-2 tw-py-1 tw-text-lg tw-rounded tw-border-0 tw-bg-{accent}-900 hover:tw-bg-{accent}-950 tw-hover:bg-indigo-900 tw-cursor-pointer tw-text-white disabled:tw-bg-neutral-400 disabled:tw-text-neutral-200 disabled:tw-cursor-default"
             disabled={!bunkerInputValue}
           >
             Connect »
@@ -393,7 +395,7 @@
                   <img
                     src={connected.picture}
                     alt=""
-                    class="tw-w-10 tw-h-10 tw-rounded-full tw-border-solid tw-border-2 tw-border-transparent group-hover:tw-border-cyan-100"
+                    class="tw-w-10 tw-h-10 tw-rounded-full tw-border-solid tw-border-2 tw-border-transparent group-hover:tw-border-{accent}-100"
                   />
                 {/if}
                 {#if connected.name}
@@ -409,7 +411,7 @@
           </a>
         </div>
         <button
-          class="tw-block tw-w-full tw-my-2 tw-mt-6 tw-px-2 tw-py-1 tw-text-lg tw-rounded tw-border-0 tw-bg-cyan-900 hover:tw-bg-cyan-950 tw-hover:bg-indigo-900 tw-cursor-pointer tw-text-white"
+          class="tw-block tw-w-full tw-my-2 tw-mt-6 tw-px-2 tw-py-1 tw-text-lg tw-rounded tw-border-0 tw-bg-{accent}-900 hover:tw-bg-{accent}-950 tw-hover:bg-indigo-900 tw-cursor-pointer tw-text-white"
           on:click={handleDisconnect}>Disconnect</button
         >
         <div class="tw-block tw-break-all tw-mt-6 tw-text-center tw-text-sm">
@@ -420,3 +422,25 @@
     </div>
   {/if}
 </div>
+<!-- Hack to preload tailwind colors -->
+<div
+  class="hidden tw-bg-cyan-700 tw-bg-cyan-800 tw-bg-cyan-900 tw-bg-cyan-950 tw-text-cyan-950"
+></div>
+<div
+  class="hidden tw-bg-green-700 tw-bg-green-800 tw-bg-green-900 tw-bg-green-950 tw-text-green-950"
+></div>
+<div
+  class="hidden tw-bg-purple-700 tw-bg-purple-800 tw-bg-purple-900 tw-bg-purple-950 tw-text-purple-950"
+></div>
+<div
+  class="hidden tw-bg-red-700 tw-bg-red-800 tw-bg-red-900 tw-bg-red-950 tw-text-red-950"
+></div>
+<div
+  class="hidden tw-bg-orange-700 tw-bg-orange-800 tw-bg-orange-900 tw-bg-orange-950 tw-text-orange-950"
+></div>
+<div
+  class="hidden tw-bg-neutral-700 tw-bg-neutral-800 tw-bg-neutral-900 tw-bg-neutral-950 tw-text-neutral-950"
+></div>
+<div
+  class="hidden tw-bg-stone-700 tw-bg-stone-800 tw-bg-stone-900 tw-bg-stone-950 tw-text-stone-950"
+></div>
