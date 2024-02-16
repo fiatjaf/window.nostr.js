@@ -9,3 +9,7 @@ build:
 
 demo:
   xdg-open demo/index.html
+
+publish:
+  just build
+  npm publish

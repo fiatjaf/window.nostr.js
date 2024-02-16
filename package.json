@@ -1,6 +1,6 @@
 {
   "name": "window.nostr.js",
-  "private": true,
+  "version": "0.0.2",
   "type": "module",
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^3.0.2",
