@@ -246,12 +246,17 @@
         Login with Nostr
       {:else}
         <div class="tw-flex tw-items-center">
-          {#if connected.picture }
-            <img src="{connected.picture}" alt='' class="tw-w-5 tw-h-5 tw-rounded-full tw-mr-2" />
+          {#if connected.picture}
+            <img
+              src={connected.picture}
+              alt=""
+              class="tw-w-5 tw-h-5 tw-rounded-full tw-mr-2"
+            />
           {:else}
             ☉
           {/if}
-          {connected.name || connected.npub.slice(0, 7) + '…' + connected.npub.slice(-4)}
+          {connected.name ||
+            connected.npub.slice(0, 7) + '…' + connected.npub.slice(-4)}
         </div>
       {/if}
     </div>
@@ -261,7 +266,11 @@
     <div
       class="tw-w-80 tw-px-6 tw-py-8 tw-transition-all tw-bg-cyan-700 tw-rounded-md tw-shadow-[0_0px_30px_0px_rgba(0,0,0,0.6)]"
     >
-      <button on:click={handleCloseModal} class="tw-absolute tw-top-0 tw-right-0.5 tw-bg-transparent tw-border-none tw-cursor-pointer tw-text-cyan-950 tw-text-3xl">⤫</button>
+      <button
+        on:click={handleCloseModal}
+        class="tw-absolute tw-top-0 tw-right-0.5 tw-bg-transparent tw-border-none tw-cursor-pointer tw-text-cyan-950 tw-text-3xl"
+        >⤫</button
+      >
       <!-- Create account view ################### -->
       {#if creating}
         <div class="tw-text-lg tw-text-center">Create a new Nostr account</div>
@@ -322,18 +331,32 @@
         <!-- Connected view ################### -->
       {:else if connected}
         <div class="tw-text-center">
-          <div class="tw-text-xs tw-mb-4">You are currently connect to Nostr as</div>
-          <a target="_blank" href={'https://nosta.me/' + connected.npub}
+          <div class="tw-text-xs tw-mb-4">
+            You are currently connect to Nostr as
+          </div>
+          <a
+            target="_blank"
+            href={'https://nosta.me/' + connected.npub}
             class="tw-text-white tw-no-underline tw-group"
-            >
-            {#if connected.picture || connected.name }
-              <div class="tw-flex tw-items-center tw-justify-center tw-gap-2 tw-mb-2">
-              {#if connected.picture }
-                <img src="{connected.picture}" alt='' class="tw-w-10 tw-h-10 tw-rounded-full tw-border-solid tw-border-2 tw-border-transparent group-hover:tw-border-cyan-100" />
-              {/if}
-              {#if connected.name }
-                <div class="tw-text-3xl group-hover:tw-underline tw-decoration-2 tw-underline-offset-4 ">{ connected.name }</div>
-              {/if}
+          >
+            {#if connected.picture || connected.name}
+              <div
+                class="tw-flex tw-items-center tw-justify-center tw-gap-2 tw-mb-2"
+              >
+                {#if connected.picture}
+                  <img
+                    src={connected.picture}
+                    alt=""
+                    class="tw-w-10 tw-h-10 tw-rounded-full tw-border-solid tw-border-2 tw-border-transparent group-hover:tw-border-cyan-100"
+                  />
+                {/if}
+                {#if connected.name}
+                  <div
+                    class="tw-text-3xl group-hover:tw-underline tw-decoration-2 tw-underline-offset-4"
+                  >
+                    {connected.name}
+                  </div>
+                {/if}
               </div>
             {/if}
             <div class="tw-block tw-break-all">{connected.npub}</div>
