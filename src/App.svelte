@@ -295,12 +295,12 @@
       >
       <!-- Create account view ################### -->
       {#if creating}
-        <div class="tw-text-lg tw-text-center">Create a new Nostr account</div>
+        <div class="tw-text-lg tw-text-center">Create a Nostr account</div>
         <form class="tw-mt-4 tw-mb-1" on:submit={handleCreate}>
           <div class="tw-flex items-center">
             <!-- svelte-ignore a11y-autofocus -->
             <input
-              class="tw-box-border tw-w-full tw-px-2 tw-py-1 tw-rounded tw-text-lg tw-border-none tw-outline-none"
+              class="tw-box-border tw-w-40 tw-px-2 tw-py-1 tw-rounded tw-text-lg tw-border-none tw-outline-none"
               placeholder="bob"
               bind:this={nameInput}
               bind:value={nameInputValue}
@@ -321,11 +321,12 @@
               {/each}
             </select>
           </div>
+          <div class="tw-text-sm tw-text-center tw-mt-4 tw-leading-4 ">A window from the selected provider will pop up to finalize the creation; if it doesn't display check if the browser is blocking it</div>
           <button
             class="tw-block tw-w-full tw-mt-4 tw-px-2 tw-py-1 tw-text-lg tw-rounded tw-border-0 tw-bg-cyan-900 hover:tw-bg-cyan-950 tw-hover:bg-indigo-900 tw-cursor-pointer tw-text-white disabled:tw-bg-neutral-400 disabled:tw-text-neutral-200 disabled:tw-cursor-default"
             disabled={!chosenProvider || !nameInputValue}
           >
-            create
+            Create »
           </button>
         </form>
 
@@ -351,10 +352,10 @@
           </button>
         </form>
         <div class="tw-mt-6 tw-text-center tw-text-sm tw-leading-3">
-          Do you need a Nostr account?
+          Do you need a Nostr account?<br/>
           <button
             class="tw-border-0 tw-bg-transparent tw-text-white tw-cursor-pointer tw-underline tw-text-sm"
-            on:click={handleOpenCreate}>Get one now for free</button
+            on:click={handleOpenCreate}>Sign up now</button
           >
         </div>
 
