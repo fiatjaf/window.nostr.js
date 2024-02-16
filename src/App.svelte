@@ -178,6 +178,7 @@
     creating = true
     if (providers.length === 0)
       providers = await fetchCustodialBunkers(pool, ['wss://relay.nostr.band'])
+      chosenProvider = providers[0]
   }
 
   async function handleCreate(ev: SubmitEvent) {
