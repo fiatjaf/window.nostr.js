@@ -6,7 +6,7 @@ on:
       - '*'
 
 jobs:
-  release:
+  release-and-upload:
     name: release
     runs-on: ubuntu-latest
     steps:
@@ -17,6 +17,6 @@ jobs:
       - run: npm install
       - uses: extractions/setup-just@v1
       - run: just build
-      - uses: softprops/action-gh-release@v1
+      - uses: ncipollo/release-action@v1
         with:
-          files: dist/window.nostr.js
+          artifacts: dist/window.nostr.js
