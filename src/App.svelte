@@ -220,7 +220,7 @@
   <!-- Close status ################### -->
   {#if !opened}
     <div
-      class="tw-px-4 tw-py-2 tw-transition-all tw-bg-cyan-700 hover:tw-bg-cyan-800 tw-shadow-xl tw-rounded tw-cursor-pointer"
+      class="tw-px-4 tw-py-2 tw-transition-all tw-bg-cyan-700 hover:tw-bg-cyan-800 tw-rounded tw-cursor-pointer tw-shadow-[0_0px_10px_0px_rgba(0,0,0,0.3)]"
     >
       <!-- Connecting view ################### -->
       {#if connecting}
@@ -236,7 +236,7 @@
     <!-- Open status ################### -->
   {:else}
     <div
-      class="tw-w-80 tw-px-6 tw-py-8 tw-transition-all tw-bg-cyan-700 tw-shadow-xl tw-rounded-md"
+      class="tw-w-80 tw-px-6 tw-py-8 tw-transition-all tw-bg-cyan-700 tw-rounded-md tw-shadow-[0_0px_30px_0px_rgba(0,0,0,0.6)]"
     >
       <button on:click={handleCloseModal} class="tw-absolute tw-top-0 tw-right-0.5 tw-bg-transparent tw-border-none tw-cursor-pointer tw-text-cyan-950 tw-text-3xl">⤫</button>
       <!-- Create account view ################### -->
