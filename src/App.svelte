@@ -23,7 +23,9 @@
   const win = window as any
   const pool = new SimplePool()
   let bunkerInput: HTMLInputElement
+  let bunkerInputValue: string
   let nameInput: HTMLInputElement
+  let nameInputValue: string
   let chosenProvider: BunkerProfile | undefined
   let clientSecret: Uint8Array
   let nip46BunkerPointer: string
@@ -301,6 +303,7 @@
               class="tw-box-border tw-w-full tw-px-2 tw-py-1 tw-rounded tw-text-lg tw-border-none tw-outline-none"
               placeholder="bob"
               bind:this={nameInput}
+              bind:value={nameInputValue}
               on:input={checkNameInput}
               autofocus
             />
@@ -319,7 +322,8 @@
             </select>
           </div>
           <button
-            class="tw-block tw-w-full tw-mt-4 tw-px-2 tw-py-1 tw-text-lg tw-rounded tw-border-0 tw-bg-cyan-900 hover:tw-bg-cyan-950 tw-hover:bg-indigo-900 tw-cursor-pointer tw-text-white"
+            class="tw-block tw-w-full tw-mt-4 tw-px-2 tw-py-1 tw-text-lg tw-rounded tw-border-0 tw-bg-cyan-900 hover:tw-bg-cyan-950 tw-hover:bg-indigo-900 tw-cursor-pointer tw-text-white disabled:tw-bg-neutral-400 disabled:tw-text-neutral-200 disabled:tw-cursor-default"
+            disabled={!chosenProvider || !nameInputValue}
           >
             create
           </button>
@@ -336,10 +340,12 @@
             class="tw-box-border tw-w-full tw-px-2 tw-py-1 tw-rounded tw-text-lg tw-border-none tw-outline-none"
             placeholder="user@provider or bunker://..."
             bind:this={bunkerInput}
+            bind:value={bunkerInputValue}
             autofocus
           />
           <button
-            class="tw-block tw-w-full tw-mt-4 tw-px-2 tw-py-1 tw-text-lg tw-rounded tw-border-0 tw-bg-cyan-900 hover:tw-bg-cyan-950 tw-hover:bg-indigo-900 tw-cursor-pointer tw-text-white"
+            class="tw-block tw-w-full tw-mt-4 tw-px-2 tw-py-1 tw-text-lg tw-rounded tw-border-0 tw-bg-cyan-900 hover:tw-bg-cyan-950 tw-hover:bg-indigo-900 tw-cursor-pointer tw-text-white disabled:tw-bg-neutral-400 disabled:tw-text-neutral-200 disabled:tw-cursor-default"
+            disabled={!bunkerInputValue}
           >
             Connect »
           </button>
