@@ -253,7 +253,7 @@
   <!-- Close status ################### -->
   {#if !opened}
     <div
-      class="tw-px-4 tw-py-2 tw-transition-all tw-bg-cyan-700 hover:tw-bg-cyan-800 tw-rounded tw-cursor-pointer tw-shadow-[0_0px_10px_0px_rgba(0,0,0,0.3)]"
+      class="tw-px-4 tw-py-2 tw-bg-cyan-700 hover:tw-bg-cyan-800 tw-rounded tw-cursor-pointer tw-shadow-[0_0px_10px_0px_rgba(0,0,0,0.3)]"
     >
       <!-- Connecting view ################### -->
       {#if connecting}
@@ -280,7 +280,7 @@
     <!-- Open status ################### -->
   {:else}
     <div
-      class="tw-w-80 tw-px-6 tw-py-8 tw-transition-all tw-bg-cyan-700 tw-rounded-md tw-shadow-[0_0px_30px_0px_rgba(0,0,0,0.6)]"
+      class="tw-w-80 tw-px-6 tw-py-8 tw-bg-cyan-700 tw-rounded-md tw-shadow-[0_0px_30px_0px_rgba(0,0,0,0.6)] tw-transition-all tw-animate-show"
     >
       <button
         on:click={handleCloseModal}

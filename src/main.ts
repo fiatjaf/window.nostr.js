@@ -8,6 +8,7 @@ div.classList.add(
   'tw-fixed',
   'tw-top-6',
   'tw-right-6',
+  'tw-animate-fadein'
 )
 
 const app = new App({
