@@ -181,6 +181,10 @@
       chosenProvider = providers[0]
   }
 
+  function handleOpenLogin(ev: MouseEvent) {
+    creating = false
+  }
+
   async function handleCreate(ev: SubmitEvent) {
     ev.preventDefault()
     if (!chosenProvider) return
@@ -322,7 +326,10 @@
               {/each}
             </select>
           </div>
-          <div class="tw-text-sm tw-text-center tw-mt-4 tw-leading-4 ">A window from the selected provider will pop up to finalize the creation; if it doesn't display check if the browser is blocking it</div>
+          <div class="tw-text-sm tw-text-center tw-mt-4 tw-leading-4">
+            A window from the selected provider will pop up to finalize the
+            creation; if it doesn't display check if the browser is blocking it
+          </div>
           <button
             class="tw-block tw-w-full tw-mt-4 tw-px-2 tw-py-1 tw-text-lg tw-rounded tw-border-0 tw-bg-cyan-900 hover:tw-bg-cyan-950 tw-hover:bg-indigo-900 tw-cursor-pointer tw-text-white disabled:tw-bg-neutral-400 disabled:tw-text-neutral-200 disabled:tw-cursor-default"
             disabled={!chosenProvider || !nameInputValue}
@@ -330,6 +337,13 @@
             Create »
           </button>
         </form>
+        <div class="tw-mt-6 tw-text-center tw-text-sm tw-leading-3">
+          Do you already have a Nostr address?<br />
+          <button
+            class="tw-border-0 tw-bg-transparent tw-text-white tw-cursor-pointer tw-underline tw-text-sm"
+            on:click={handleOpenLogin}>Login now</button
+          >
+        </div>
 
         <!-- Login view ################### -->
       {:else if !connected}
@@ -353,7 +367,7 @@
           </button>
         </form>
         <div class="tw-mt-6 tw-text-center tw-text-sm tw-leading-3">
-          Do you need a Nostr account?<br/>
+          Do you need a Nostr account?<br />
           <button
             class="tw-border-0 tw-bg-transparent tw-text-white tw-cursor-pointer tw-underline tw-text-sm"
             on:click={handleOpenCreate}>Sign up now</button
