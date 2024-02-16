@@ -296,6 +296,7 @@
         <div class="tw-text-lg tw-text-center">Create a new Nostr account</div>
         <form class="tw-mt-4 tw-mb-1" on:submit={handleCreate}>
           <div class="tw-flex items-center">
+            <!-- svelte-ignore a11y-autofocus -->
             <input
               class="tw-box-border tw-w-full tw-px-2 tw-py-1 tw-rounded tw-text-lg tw-border-none tw-outline-none"
               placeholder="bob"
@@ -330,6 +331,7 @@
           How do you want to connect to Nostr?
         </div>
         <form class="flex tw-mt-4 tw-mb-1" on:submit={handleConnect}>
+          <!-- svelte-ignore a11y-autofocus -->
           <input
             class="tw-box-border tw-w-full tw-px-2 tw-py-1 tw-rounded tw-text-lg tw-border-none tw-outline-none"
             placeholder="user@provider or bunker://..."
@@ -353,8 +355,12 @@
         <!-- Connected view ################### -->
       {:else if connected}
         <div class="tw-text-center">
-          <div class="tw-text-sm tw-mb-4">You are currently connect to Nostr as</div>
-          <a target="_blank" href={'https://nosta.me/' + connected.npub}
+          <div class="tw-text-sm tw-mb-4">
+            You are currently connect to Nostr as
+          </div>
+          <a
+            target="_blank"
+            href={'https://nosta.me/' + connected.npub}
             class="tw-text-white tw-no-underline tw-group"
           >
             {#if connected.picture || connected.name}
@@ -385,7 +391,7 @@
           on:click={handleDisconnect}>Disconnect</button
         >
         <div class="tw-block tw-break-all tw-mt-6 tw-text-center tw-text-sm">
-          The bunker public key is:<br/>
+          The bunker public key is:<br />
           {nip46BunkerPointer}
         </div>
       {/if}
