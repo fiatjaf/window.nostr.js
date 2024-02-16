@@ -12,7 +12,7 @@
     type BunkerSignerParams,
     createAccount,
     parseBunkerInput,
-    fetchCustodialbunkers as fetchCustodialBunkers,
+    fetchCustodialBunkers,
     type BunkerPointer,
     type BunkerProfile
   } from 'nostr-tools/nip46'

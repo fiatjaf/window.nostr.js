@@ -1,0 +1,22 @@
+name: release
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  release:
+    name: release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 21
+      - run: npm install
+      - uses: extractions/setup-just@v1
+      - run: just build
+      - uses: softprops/action-gh-release@v1
+        with:
+          files: dist/window.nostr.js
