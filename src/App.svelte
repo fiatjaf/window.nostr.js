@@ -89,7 +89,7 @@
           isWnj: true,
           async getPublicKey(): Promise<string> {
             if (!connecting) opened = true
-            return (await bunker).remotePubkey
+            return (await bunker).bp.pubkey
           },
           async signEvent(event: NostrEvent): Promise<VerifiedEvent> {
             if (!connecting) opened = true
@@ -169,8 +169,8 @@
 
     // set this so the floating thing will update
     connected = {
-      pubkey: bunker.remotePubkey,
-      npub: npubEncode(bunker.remotePubkey),
+      pubkey: bunker.bp.pubkey,
+      npub: npubEncode(bunker.bp.pubkey),
       event: null
     }
     connecting = false
@@ -184,7 +184,7 @@
         'wss://relay.snort.social',
         'wss://relay.nos.social'
       ],
-      [{kinds: [0], authors: [bunker.remotePubkey]}],
+      [{kinds: [0], authors: [bunker.bp.pubkey]}],
       {
         onevent(evt) {
           if ((connected!.event?.created_at || 0) >= evt.created_at) return
