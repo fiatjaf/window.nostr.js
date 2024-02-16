@@ -6,12 +6,8 @@ document.body.appendChild(div)
 div.id = 'windowNostrModal'
 div.classList.add(
   'tw-fixed',
-  'tw-top-4',
-  'tw-right-4',
-  'tw-bg-zinc-100',
-  'tw-drop-shadow-md',
-  'tw-rounded',
-  'tw-text-zinc-700'
+  'tw-top-6',
+  'tw-right-6',
 )
 
 const app = new App({

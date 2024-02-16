@@ -173,6 +173,7 @@
       npub: npubEncode(bunker.remotePubkey),
       event: null
     }
+    connecting = false
 
     localStorage.setItem('nip46BunkerPointer', JSON.stringify(bunkerPointer))
 
@@ -207,88 +208,103 @@
 <svelte:window on:click={handleClick} />
 
 <div
-  class="tw-opacity-50 hover:tw-opacity-100 tw-px-4 tw-py-2 tw-transition-all"
+  class="tw-text-white tw-font-sans"
   class:tw-cursor-pointer={!connected && !opened}
 >
-  {#if creating}
-    <form class="tw-mt-2 tw-mb-1" on:submit={handleCreate}>
-      <div class="tw-flex items-center">
-        <input
-          class="tw-px-2 tw-py-1 tw-text-lg tw-text-right"
-          placeholder="bob"
-          bind:this={nameInput}
-          on:input={checkNameInput}
-        />
-        <select
-          class="tw-ml-2 tw-px-2 tw-py-1 tw-text-lg"
-          bind:value={chosenProvider}
-        >
-          {#each providers as prov}
-            <option
-              label={prov.domain}
-              value={prov}
-              class="tw-px-2 tw-py-1 tw-text-lg"
-            />
-          {/each}
-        </select>
-      </div>
-      <button
-        class="tw-block tw-w-full tw-mt-2 tw-px-2 tw-py-1 tw-text-lg tw-border-0 tw-bg-indigo-800 tw-hover:bg-indigo-900 tw-cursor-pointer tw-text-white"
-      >
-        create
-      </button>
-    </form>
-  {:else if connected}
-    <div class="tw-text-right">
-      {#if opened}
-        connected as
+  <!-- Close status ################### -->
+  {#if !opened}
+    <div
+      class="tw-px-4 tw-py-2 tw-transition-all tw-bg-cyan-700 hover:tw-bg-cyan-800 tw-shadow-xl tw-rounded tw-cursor-pointer"
+    >
+      <!-- Connecting view ################### -->
+      {#if connecting}
+        <div>Connecting to bunker...</div>
+      {:else if !connected}
+        Login with Nostr
+      {:else}
+        ☉ {connected.name ||
+          connected.npub.slice(0, 7) + '…' + connected.npub.slice(-4)}
       {/if}
-      {connected.name ||
-        connected.npub.slice(0, 7) + '…' + connected.npub.slice(-4)}
     </div>
-    {#if opened}
-      <div class="tw-my-2">
-        <a
-          target="_blank"
-          href={'https://nosta.me/' + connected.npub}
-          class="tw-no-underline tw-text-inherit tw-text-xs">{connected.npub}</a
-        >
-        <button
-          class="tw-block tw-w-full tw-mt-2 tw-px-2 tw-py-1 tw-text-sm tw-border-0 tw-bg-zinc-700 tw-hover:bg-zinc-900 tw-cursor-pointer tw-text-white"
-          on:click={handleDisconnect}>disconnect</button
-        >
-      </div>
-    {/if}
-  {:else if connecting}
-    <div>connecting to bunker</div>
+
+    <!-- Open status ################### -->
   {:else}
-    <div class="tw-flex tw-items-center tw-justify-center">
-      {#if opened}
-        connect with
+    <div
+      class="tw-w-80 tw-px-6 tw-py-6 tw-transition-all tw-bg-cyan-700 tw-shadow-xl tw-rounded-md"
+    >
+      <!-- Create account view ################### -->
+      {#if creating}
+        <div class="tw-text-lg tw-text-center">Create a new Nostr account</div>
+        <form class="tw-mt-4 tw-mb-1" on:submit={handleCreate}>
+          <div class="tw-flex items-center">
+            <input
+              class="tw-box-border tw-w-full tw-px-2 tw-py-1 tw-rounded tw-text-lg tw-border-none tw-outline-none"
+              placeholder="bob"
+              bind:this={nameInput}
+              on:input={checkNameInput}
+            />
+            <div class="tw-mx-2 tw-text-2xl">@</div>
+            <select
+              class="tw-w-full tw-box-border tw-px-2 tw-py-1 tw-rounded tw-text-lg tw-border-none tw-outline-none"
+              bind:value={chosenProvider}
+            >
+              {#each providers as prov}
+                <option
+                  label={prov.domain}
+                  value={prov}
+                  class="tw-px-2 tw-py-1 tw-text-lg"
+                />
+              {/each}
+            </select>
+          </div>
+          <button
+            class="tw-block tw-w-full tw-mt-4 tw-px-2 tw-py-1 tw-text-lg tw-rounded tw-border-0 tw-bg-cyan-900 hover:tw-bg-cyan-950 tw-hover:bg-indigo-900 tw-cursor-pointer tw-text-white"
+          >
+            create
+          </button>
+        </form>
+
+        <!-- Login view ################### -->
+      {:else if !connected}
+        <div class="tw-text-lg tw-text-center">
+          How do you want to connect to Nostr?
+        </div>
+        <form class="flex tw-mt-4 tw-mb-1" on:submit={handleConnect}>
+          <input
+            class="tw-box-border tw-w-full tw-px-2 tw-py-1 tw-rounded tw-text-lg tw-border-none tw-outline-none"
+            placeholder="user@provider or bunker://..."
+            bind:this={bunkerInput}
+          />
+          <button
+            class="tw-block tw-w-full tw-mt-4 tw-px-2 tw-py-1 tw-text-lg tw-rounded tw-border-0 tw-bg-cyan-900 hover:tw-bg-cyan-950 tw-hover:bg-indigo-900 tw-cursor-pointer tw-text-white"
+          >
+            Connect »
+          </button>
+        </form>
+        <div class="tw-mt-6 tw-text-center tw-text-sm tw-leading-3">
+          Do you need a Nostr account?
+          <button
+            class="tw-border-0 tw-bg-transparent tw-text-white tw-cursor-pointer tw-underline tw-text-sm"
+            on:click={handleOpenCreate}>Get one now for free</button
+          >
+        </div>
+
+        <!-- Connected view ################### -->
+      {:else if connected}
+        <div class="tw-text-center">
+          <div class="tw-text-xs">You are currently connect to Nostr as</div>
+          <a
+            target="_blank"
+            href={'https://nosta.me/' + connected.npub}
+            class="tw-block tw-text-white tw-mt-4 tw-break-all tw-no-underline hover:tw-underline"
+            >{connected.npub}</a
+          >
+        </div>
+        <button
+          class="tw-block tw-w-full tw-my-2 tw-mt-4 tw-px-2 tw-py-1 tw-text-lg tw-rounded tw-border-0 tw-bg-cyan-900 hover:tw-bg-cyan-950 tw-hover:bg-indigo-900 tw-cursor-pointer tw-text-white"
+          on:click={handleDisconnect}>Disconnect</button
+        >
       {/if}
-      <span class="tw-ml-1 tw-text-indigo-700 tw-border-0 tw-outline-0">
-        NOSTR
-      </span>
     </div>
-    {#if opened}
-      <form class="tw-mt-2 tw-mb-1" on:submit={handleConnect}>
-        <input
-          class="tw-px-2 tw-py-1 tw-text-lg"
-          placeholder="user@provider or bunker://..."
-          bind:this={bunkerInput}
-        />
-        <button
-          class="tw-block tw-w-full tw-mt-2 tw-px-2 tw-py-1 tw-text-lg tw-border-0 tw-bg-indigo-800 tw-hover:bg-indigo-900 tw-cursor-pointer tw-text-white"
-        >
-          connect
-        </button>
-      </form>
-      <div class="tw-text-right tw-mb-1">
-        <button
-          class="tw-border-0 tw-text-sm tw-cursor-pointer hover:tw-underline"
-          on:click={handleOpenCreate}>create account</button
-        >
-      </div>
-    {/if}
   {/if}
 </div>
