@@ -51,6 +51,18 @@
   let providers: BunkerProfile[] = []
   reset()
 
+  let windowNostr = {
+    isWnj: true,
+    async getPublicKey(): Promise<string> {
+      if (!connecting) opened = true
+      return (await bunker).bp.pubkey
+    },
+    async signEvent(event: NostrEvent): Promise<VerifiedEvent> {
+      if (!connecting) opened = true
+      return (await bunker).signEvent(event)
+    }
+  }
+
   function reset() {
     opened = false
     bunkerPointer = null
@@ -80,24 +92,29 @@
       )
     }
 
-    setTimeout(() => {
-      if (win.nostr && !win.nostr.isWnj) {
-        win.destroyWnj()
-        return
-      } else {
-        win.nostr = {
-          isWnj: true,
-          async getPublicKey(): Promise<string> {
-            if (!connecting) opened = true
-            return (await bunker).bp.pubkey
-          },
-          async signEvent(event: NostrEvent): Promise<VerifiedEvent> {
-            if (!connecting) opened = true
-            return (await bunker).signEvent(event)
-          }
-        }
-      }
-    }, 3000)
+    if (win.nostr && !win.nostr.isWnj) {
+      // there is already a window.nostr
+      // (and it is not our own from a previous development hmr)
+      // so we just vanish
+      win.destroyWnj()
+      return
+    } else {
+      // there is no window.nostr, so we set this
+      // if an extension shows up later and sets this on top of ours we will vanish
+      Object.defineProperty(window, 'nostr', {
+        get: function () {
+          return windowNostr
+        },
+        set: function (v) {
+          // replace the internal object we have
+          windowNostr = v
+
+          // this is being set by an extension, so we vanish
+          if (!v.isWnj) win.destroyWnj()
+        },
+        configurable: true // this allows Object.defineProperty() to be called again
+      })
+    }
 
     return () => {
       if (metadataSub) metadataSub.close()
