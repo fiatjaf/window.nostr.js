@@ -301,6 +301,7 @@
               placeholder="bob"
               bind:this={nameInput}
               on:input={checkNameInput}
+              autofocus
             />
             <div class="tw-mx-2 tw-text-2xl">@</div>
             <select
@@ -333,6 +334,7 @@
             class="tw-box-border tw-w-full tw-px-2 tw-py-1 tw-rounded tw-text-lg tw-border-none tw-outline-none"
             placeholder="user@provider or bunker://..."
             bind:this={bunkerInput}
+            autofocus
           />
           <button
             class="tw-block tw-w-full tw-mt-4 tw-px-2 tw-py-1 tw-text-lg tw-rounded tw-border-0 tw-bg-cyan-900 hover:tw-bg-cyan-950 tw-hover:bg-indigo-900 tw-cursor-pointer tw-text-white"
