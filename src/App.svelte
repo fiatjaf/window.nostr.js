@@ -110,6 +110,12 @@
     else opened = false
   }
 
+  function handleCloseModal(ev: MouseEvent) {
+    opened = false
+    creating = false
+    ev.stopPropagation()
+  }
+
   async function handleConnect(ev: SubmitEvent) {
     ev.preventDefault()
     bunkerPointer = await parseBunkerInput(bunkerInput.value)
@@ -230,8 +236,9 @@
     <!-- Open status ################### -->
   {:else}
     <div
-      class="tw-w-80 tw-px-6 tw-py-6 tw-transition-all tw-bg-cyan-700 tw-shadow-xl tw-rounded-md"
+      class="tw-w-80 tw-px-6 tw-py-8 tw-transition-all tw-bg-cyan-700 tw-shadow-xl tw-rounded-md"
     >
+      <button on:click={handleCloseModal} class="tw-absolute tw-top-0 tw-right-0.5 tw-bg-transparent tw-border-none tw-cursor-pointer tw-text-cyan-950 tw-text-3xl">⤫</button>
       <!-- Create account view ################### -->
       {#if creating}
         <div class="tw-text-lg tw-text-center">Create a new Nostr account</div>
