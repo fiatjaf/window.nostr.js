@@ -61,6 +61,12 @@
       if (!connecting && !connected) opened = true
       return (await bunker).signEvent(event)
     },
+    async getRelays(): Promise<{
+      [url: string]: {read: boolean; write: boolean}
+    }> {
+      if (!connecting && !connected) opened = true
+      return (await bunker).getRelays()
+    },
     nip04: {
       async encrypt(pubkey: string, plaintext: string): Promise<string> {
         if (!connecting && !connected) opened = true
@@ -70,7 +76,7 @@
         if (!connecting && !connected) opened = true
         return (await bunker).nip04Decrypt(pubkey, ciphertext)
       }
-    },
+    }
   }
 
   function reset() {
@@ -341,9 +347,7 @@
         <!-- Connected view ################### -->
       {:else if connected}
         <div class="tw-text-center">
-          <div class="tw-text-xs tw-mb-4">
-            You are connected to Nostr as
-          </div>
+          <div class="tw-text-xs tw-mb-4">You are connected to Nostr as</div>
           <a
             target="_blank"
             href={'https://nosta.me/' + connected.npub}
