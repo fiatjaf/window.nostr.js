@@ -1,38 +1,42 @@
-import './app.css'
+import styles from './app.css?inline'
 import App from './App.svelte'
-
-const div = document.createElement('div')
-document.body.appendChild(div)
-div.id = 'windowNostrModal'
 
 // To customize the widget add this code before the <script src='...' inclusion
 // --- --- --- --- --- --- --- --- ---
 // <script>
-//   window.windowNostrJsParams = {
+//   window.wnjParams = {
 //     position: 'bottom'
 //     accent: 'green' // Supported values: cyan (default), green, purple, red, orange, neutral, stone
 //   }
 // </script>
 
-const position = (window as any).windowNostrJsParams
-  ? (window as any).windowNostrJsParams.position || 'top'
-  : 'top'
-const accent = (window as any).windowNostrJsParams
-  ? (window as any).windowNostrJsParams.accent || 'cyan'
-  : 'cyan'
+const win = window as any
 
-div.classList.add('tw-fixed', 'tw-right-6', 'tw-animate-fadein')
-
-if (position === 'bottom') {
-  div.classList.add('tw-bottom-6')
+const base = document.createElement('div')
+base.style.position = 'fixed'
+base.style.right = '1.5rem'
+if (win.wnjParams?.position === 'bottom') {
+  base.style.bottom = '1.5rem'
 } else {
-  div.classList.add('tw-top-6')
+base.style.top = '1.5rem'
 }
+document.body.appendChild(base)
+
+const mountPoint = document.createElement('div')
+mountPoint.id = 'windowNostrModal'
+mountPoint.classList.add('tw-animate-fadein')
+
+const style = document.createElement('style')
+style.innerHTML = styles
+
+const shadowRoot = base.attachShadow({mode: 'open'})
+shadowRoot.appendChild(mountPoint)
+shadowRoot.appendChild(style)
 
 const app = new App({
-  target: div,
+  target: mountPoint,
   props: {
-    accent: accent
+    accent: win.wnjParams?.accent || 'cyan'
   }
 })
 
