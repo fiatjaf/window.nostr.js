@@ -178,12 +178,13 @@
   async function handleOpenCreate(ev: MouseEvent) {
     ev.preventDefault()
     creating = true
-    if (providers.length === 0)
+    if (providers.length === 0) {
       providers = await fetchCustodialBunkers(pool, ['wss://relay.nostr.band'])
-    chosenProvider = providers[0]
+      chosenProvider = providers[0]
+    }
   }
 
-  function handleOpenLogin(ev: MouseEvent) {
+  function handleOpenLogin(_: MouseEvent) {
     creating = false
   }
 
