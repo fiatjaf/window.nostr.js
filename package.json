@@ -2,6 +2,7 @@
   "name": "window.nostr.js",
   "version": "0.0.4",
   "type": "module",
+  "main": "dist/window.nostr.js",
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^3.0.2",
     "@tsconfig/svelte": "^5.0.2",
