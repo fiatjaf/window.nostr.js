@@ -10,5 +10,8 @@ export default defineConfig({
         format: 'iife'
       }
     }
+  },
+  server: {
+    cors: true
   }
 })
