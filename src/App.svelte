@@ -420,25 +420,13 @@
     </div>
   {/if}
 </div>
-<!-- Hack to preload tailwind colors -->
-<div
-  class="hidden tw-bg-cyan-700 tw-bg-cyan-800 tw-bg-cyan-900 tw-bg-cyan-950 tw-text-cyan-950"
-></div>
-<div
-  class="hidden tw-bg-green-700 tw-bg-green-800 tw-bg-green-900 tw-bg-green-950 tw-text-green-950"
-></div>
-<div
-  class="hidden tw-bg-purple-700 tw-bg-purple-800 tw-bg-purple-900 tw-bg-purple-950 tw-text-purple-950"
-></div>
-<div
-  class="hidden tw-bg-red-700 tw-bg-red-800 tw-bg-red-900 tw-bg-red-950 tw-text-red-950"
-></div>
-<div
-  class="hidden tw-bg-orange-700 tw-bg-orange-800 tw-bg-orange-900 tw-bg-orange-950 tw-text-orange-950"
-></div>
-<div
-  class="hidden tw-bg-neutral-700 tw-bg-neutral-800 tw-bg-neutral-900 tw-bg-neutral-950 tw-text-neutral-950"
-></div>
-<div
-  class="hidden tw-bg-stone-700 tw-bg-stone-800 tw-bg-stone-900 tw-bg-stone-950 tw-text-stone-950"
-></div>
+
+<!-- hack to preload tailwind colors:
+tw-bg-cyan-700 tw-bg-cyan-800 tw-bg-cyan-900 tw-bg-cyan-950 tw-text-cyan-950
+tw-bg-green-700 tw-bg-green-800 tw-bg-green-900 tw-bg-green-950 tw-text-green-950
+tw-bg-purple-700 tw-bg-purple-800 tw-bg-purple-900 tw-bg-purple-950 tw-text-purple-950
+tw-bg-red-700 tw-bg-red-800 tw-bg-red-900 tw-bg-red-950 tw-text-red-950
+tw-bg-orange-700 tw-bg-orange-800 tw-bg-orange-900 tw-bg-orange-950 tw-text-orange-950
+tw-bg-neutral-700 tw-bg-neutral-800 tw-bg-neutral-900 tw-bg-neutral-950 tw-text-neutral-950
+tw-bg-stone-700 tw-bg-stone-800 tw-bg-stone-900 tw-bg-stone-950 tw-text-stone-950
+-->
