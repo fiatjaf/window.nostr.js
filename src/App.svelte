@@ -377,9 +377,7 @@
         <!-- Connected view ################### -->
       {:else if connected}
         <div class="tw-text-center">
-          <div class="tw-text-sm tw-mb-4">
-            You are currently connect to Nostr as
-          </div>
+          <div class="tw-text-sm tw-mb-4">You are connected to Nostr as</div>
           <a
             target="_blank"
             href={'https://nosta.me/' + connected.npub}
