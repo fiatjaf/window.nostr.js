@@ -15,9 +15,10 @@
     parseBunkerInput,
     fetchCustodialBunkers,
     type BunkerPointer,
-    type BunkerProfile
+    type BunkerProfile,
+    BUNKER_REGEX
   } from 'nostr-tools/nip46'
-  import {queryProfile} from 'nostr-tools/nip05'
+  import {NIP05_REGEX, queryProfile} from 'nostr-tools/nip05'
   import {npubEncode} from 'nostr-tools/nip19'
   import {onMount} from 'svelte'
 
@@ -55,6 +56,11 @@
   let metadataSub: SubCloser | null
   let providers: BunkerProfile[] = []
   reset()
+
+  $: bunkerInputValueIsGood =
+    bunkerInputValue &&
+    (bunkerInputValue.match(BUNKER_REGEX) ||
+      bunkerInputValue.match(NIP05_REGEX))
 
   let windowNostr = {
     isWnj: true,
@@ -361,7 +367,7 @@
           />
           <button
             class="tw-block tw-w-full tw-mt-4 tw-px-2 tw-py-1 tw-text-lg tw-rounded tw-border-0 tw-bg-{accent}-900 hover:tw-bg-{accent}-950 tw-hover:bg-indigo-900 tw-cursor-pointer tw-text-white disabled:tw-bg-neutral-400 disabled:tw-text-neutral-200 disabled:tw-cursor-default"
-            disabled={!bunkerInputValue}
+            disabled={!bunkerInputValueIsGood}
           >
             Connect »
           </button>
