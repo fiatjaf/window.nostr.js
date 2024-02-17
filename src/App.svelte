@@ -4,7 +4,8 @@
   import {
     generateSecretKey,
     type VerifiedEvent,
-    type NostrEvent
+    type NostrEvent,
+    getPublicKey
   } from 'nostr-tools/pure'
   import {SimplePool, type SubCloser} from 'nostr-tools/pool'
   import {
@@ -30,7 +31,6 @@
   let nameInputValue: string
   let chosenProvider: BunkerProfile | undefined
   let clientSecret: Uint8Array
-  let nip46BunkerPointer: string
   const local = localStorage.getItem('nip46ClientSecretKey')
   if (local) {
     clientSecret = hexToBytes(local)
@@ -226,9 +226,6 @@
     connecting = false
 
     localStorage.setItem('nip46BunkerPointer', JSON.stringify(bunkerPointer))
-    if (typeof bunkerPointer?.pubkey === 'string') {
-      nip46BunkerPointer = bunkerPointer?.pubkey
-    }
 
     // load metadata
     metadataSub = pool.subscribeMany(
@@ -416,8 +413,8 @@
           on:click={handleDisconnect}>Disconnect</button
         >
         <div class="tw-block tw-break-all tw-mt-6 tw-text-center tw-text-sm">
-          The bunker public key is:<br />
-          {nip46BunkerPointer}
+          This webpage is using the public key:<br />
+          {getPublicKey(clientSecret)}
         </div>
       {/if}
     </div>
