@@ -4,4 +4,4 @@ a small `<script>` you can drop in any page that already uses [NIP-07](https://n
 
 ## How to use it
 
-Include `<script src="https://cdn.jsdelivr.net/npm/window.nostr.js@latest/dist/window.nostr.js"></script>` in your HTML and proceed to use [`window.nostr`](https://nips.nostr.com/7) normally.
+Include `<script src="https://unpkg.com/window.nostr.js/dist/window.nostr.js"></script>` in your HTML and proceed to use [`window.nostr`](https://nips.nostr.com/7) normally.
