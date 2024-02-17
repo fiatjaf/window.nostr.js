@@ -40,7 +40,7 @@
     localStorage.setItem('nip46ClientSecretKey', bytesToHex(clientSecret))
   }
 
-  let opened: Boolean
+  let state: 'opened' | 'closed' | 'justopened' | 'justclosed' = 'closed'
   let bunkerPointer: BunkerPointer | null
   let resolveBunker: (_: BunkerSigner) => void
   let bunker: Promise<BunkerSigner>
@@ -55,43 +55,67 @@
   }
   let metadataSub: SubCloser | null
   let providers: BunkerProfile[] = []
-  reset()
 
   $: bunkerInputValueIsGood =
     bunkerInputValue &&
     (bunkerInputValue.match(BUNKER_REGEX) ||
       bunkerInputValue.match(NIP05_REGEX))
 
+  const delayedUpdateState = debounce(() => {
+    switch (state) {
+      case 'justopened':
+        state = 'opened'
+        break
+      case 'justclosed':
+        state = 'closed'
+        break
+    }
+  }, 500)
+
+  function open() {
+    state = 'justopened'
+    delayedUpdateState()
+  }
+
+  function close() {
+    state = 'justclosed'
+    delayedUpdateState()
+  }
+
+  $: opened = state === 'justopened' || state === 'opened'
+
+  reset()
+
   let windowNostr = {
     isWnj: true,
     async getPublicKey(): Promise<string> {
-      if (!connecting && !connected) opened = true
+      if (!connecting && !connected) open()
       return (await bunker).bp.pubkey
     },
     async signEvent(event: NostrEvent): Promise<VerifiedEvent> {
-      if (!connecting && !connected) opened = true
+      if (!connecting && !connected) open()
       return (await bunker).signEvent(event)
     },
     async getRelays(): Promise<{
       [url: string]: {read: boolean; write: boolean}
     }> {
-      if (!connecting && !connected) opened = true
+      if (!connecting && !connected) open()
       return (await bunker).getRelays()
     },
     nip04: {
       async encrypt(pubkey: string, plaintext: string): Promise<string> {
-        if (!connecting && !connected) opened = true
+        if (!connecting && !connected) open()
         return (await bunker).nip04Encrypt(pubkey, plaintext)
       },
       async decrypt(pubkey: string, ciphertext: string): Promise<string> {
-        if (!connecting && !connected) opened = true
+        if (!connecting && !connected) open()
         return (await bunker).nip04Decrypt(pubkey, ciphertext)
       }
     }
   }
 
   function reset() {
-    opened = false
+    close()
     bunkerPointer = null
     bunker = new Promise(resolve => {
       resolveBunker = resolve
@@ -149,13 +173,14 @@
   })
 
   function handleClick(ev: MouseEvent) {
-    if (ev.composedPath().find((el: any) => el.id === 'windowNostrModal'))
-      opened = true
-    else opened = false
+    if (state === 'justopened' || state === 'justclosed') return
+
+    if (ev.composedPath().find((el: any) => el.id === 'wnj')) open()
+    else close()
   }
 
   function handleCloseModal(ev: MouseEvent) {
-    opened = false
+    close()
     creating = false
     ev.stopPropagation()
   }
@@ -204,7 +229,8 @@
       nameInput.value,
       chosenProvider.domain
     )
-    opened = true
+
+    open()
     creating = false
 
     connect(bunker)
@@ -256,7 +282,7 @@
       }
     )
 
-    opened = false
+    close()
     resolveBunker(bunker)
   }
 </script>

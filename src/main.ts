@@ -18,12 +18,12 @@ base.style.right = '1.5rem'
 if (win.wnjParams?.position === 'bottom') {
   base.style.bottom = '1.5rem'
 } else {
-base.style.top = '1.5rem'
+  base.style.top = '1.5rem'
 }
 document.body.appendChild(base)
 
 const mountPoint = document.createElement('div')
-mountPoint.id = 'windowNostrModal'
+mountPoint.id = 'wnj'
 mountPoint.classList.add('tw-animate-fadein')
 
 const style = document.createElement('style')
