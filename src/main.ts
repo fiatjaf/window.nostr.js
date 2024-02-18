@@ -13,6 +13,7 @@ import App from './App.svelte'
 const win = window as any
 
 const base = document.createElement('div')
+base.style.zIndex = '10000'
 base.style.position = 'fixed'
 base.style.right = '1.5rem'
 if (win.wnjParams?.position === 'bottom') {
