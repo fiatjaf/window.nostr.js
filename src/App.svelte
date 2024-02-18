@@ -22,7 +22,9 @@
   import {npubEncode} from 'nostr-tools/nip19'
   import {onMount} from 'svelte'
 
+  let myself
   export let accent: string
+  export let position: string
 
   const win = window as any
   const pool = new SimplePool()
@@ -173,6 +175,10 @@
   })
 
   function handleClick(ev: MouseEvent) {
+    if (moving) {
+      return
+    }
+
     if (state === 'justopened' || state === 'justclosed') return
 
     if (ev.composedPath().find((el: any) => el.id === 'wnj')) open()
@@ -285,18 +291,84 @@
     close()
     resolveBunker(bunker)
   }
+
+  export let right = 20
+  export let ypos = 20
+  let moving = false
+  let mouseDown = false
+  let timeoutId: any
+  let insidePosition: any
+  $: positionStyle = moving ? 'absolute' : 'fixed'
+  $: movingStyle = moving
+    ? 'tw-cursor-grabbing tw-outline-dashed tw-outline-' +
+      accent +
+      '-500 tw-outline-1 tw-outline-offset-4'
+    : 'tw-outline-none'
+
+  function updatePosition() {
+    if (!myself) return false
+    const rect = myself.getBoundingClientRect()
+    const viewportHeight = window.innerHeight
+    const viewportMidpoint = viewportHeight / 2
+    if (rect.top < viewportMidpoint) {
+      position = 'top'
+      ypos = rect.top
+    } else {
+      position = 'bottom'
+      ypos = viewportHeight - rect.bottom
+    }
+  }
+
+  function onMouseDown(e) {
+    mouseDown = true
+    timeoutId = setTimeout(() => {
+      moving = true
+      const rect = myself.getBoundingClientRect()
+      insidePosition = e.clientY - rect.top
+    }, 600)
+  }
+
+  function onMouseMove(e) {
+    if (!mouseDown || !moving) return
+
+    if ((position = 'top')) {
+      ypos = e.clientY
+    } else {
+      ypos = window.innerHeight - e.clientY
+    }
+    ypos -= insidePosition
+  }
+
+  function onMouseUp() {
+    if (moving) {
+      updatePosition()
+    }
+    mouseDown = false
+    clearTimeout(timeoutId)
+    setTimeout(() => {
+      moving = false
+    }, 200)
+  }
 </script>
 
-<svelte:window on:click={handleClick} />
+<svelte:window
+  on:click={handleClick}
+  on:mouseup={onMouseUp}
+  on:mousemove={onMouseMove}
+/>
 
+<!-- svelte-ignore a11y-no-static-element-interactions -->
 <div
-  class="tw-text-white tw-font-sans"
+  class="tw-text-white tw-font-sans draggable tw-animate-fadein"
   class:tw-cursor-pointer={!connected && !opened}
+  style="position: {positionStyle}; right: {right}px; {position}: {ypos}px; user-select: none; "
+  on:mousedown={onMouseDown}
+  bind:this={myself}
 >
   <!-- Close status ################### -->
   {#if !opened}
     <div
-      class="tw-px-4 tw-py-2 tw-bg-{accent}-700 hover:tw-bg-{accent}-800 tw-rounded tw-cursor-pointer tw-shadow-[0_0px_10px_0px_rgba(0,0,0,0.3)]"
+      class="tw-px-4 tw-py-2 tw-bg-{accent}-700 hover:tw-bg-{accent}-800 tw-rounded tw-shadow-[0_0px_10px_0px_rgba(0,0,0,0.3)] tw-transition-all tw-duration-200 {movingStyle}"
     >
       <!-- Connecting view ################### -->
       {#if connecting}
@@ -323,7 +395,7 @@
     <!-- Open status ################### -->
   {:else}
     <div
-      class="tw-w-80 tw-px-6 tw-py-8 tw-bg-{accent}-700 tw-rounded-md tw-shadow-[0_0px_30px_0px_rgba(0,0,0,0.6)] tw-transition-all tw-animate-show"
+      class="tw-w-80 tw-px-6 tw-py-8 tw-bg-{accent}-700 tw-rounded-md tw-shadow-[0_0px_30px_0px_rgba(0,0,0,0.6)] tw-transition-all tw-animate-show {movingStyle}"
     >
       <button
         on:click={handleCloseModal}
@@ -452,11 +524,11 @@
 </div>
 
 <!-- hack to preload tailwind colors:
-tw-bg-cyan-700 tw-bg-cyan-800 tw-bg-cyan-900 tw-bg-cyan-950 tw-text-cyan-950
-tw-bg-green-700 tw-bg-green-800 tw-bg-green-900 tw-bg-green-950 tw-text-green-950
-tw-bg-purple-700 tw-bg-purple-800 tw-bg-purple-900 tw-bg-purple-950 tw-text-purple-950
-tw-bg-red-700 tw-bg-red-800 tw-bg-red-900 tw-bg-red-950 tw-text-red-950
-tw-bg-orange-700 tw-bg-orange-800 tw-bg-orange-900 tw-bg-orange-950 tw-text-orange-950
-tw-bg-neutral-700 tw-bg-neutral-800 tw-bg-neutral-900 tw-bg-neutral-950 tw-text-neutral-950
-tw-bg-stone-700 tw-bg-stone-800 tw-bg-stone-900 tw-bg-stone-950 tw-text-stone-950
+tw-bg-cyan-700 tw-bg-cyan-800 tw-bg-cyan-900 tw-bg-cyan-950 tw-text-cyan-950 tw-outline-cyan-500
+tw-bg-green-700 tw-bg-green-800 tw-bg-green-900 tw-bg-green-950 tw-text-green-950 tw-outline-green-500
+tw-bg-purple-700 tw-bg-purple-800 tw-bg-purple-900 tw-bg-purple-950 tw-text-purple-950 tw-outline-purple-500
+tw-bg-red-700 tw-bg-red-800 tw-bg-red-900 tw-bg-red-950 tw-text-red-950 tw-outline-red-500
+tw-bg-orange-700 tw-bg-orange-800 tw-bg-orange-900 tw-bg-orange-950 tw-text-orange-950 tw-outline-orange-500
+tw-bg-neutral-700 tw-bg-neutral-800 tw-bg-neutral-900 tw-bg-neutral-950 tw-text-neutral-950 tw-outline-neutral-500
+tw-bg-stone-700 tw-bg-stone-800 tw-bg-stone-900 tw-bg-stone-950 tw-text-stone-950 tw-outline-stone-500
 -->

@@ -14,18 +14,10 @@ const win = window as any
 
 const base = document.createElement('div')
 base.style.zIndex = '10000'
-base.style.position = 'fixed'
-base.style.right = '1.5rem'
-if (win.wnjParams?.position === 'bottom') {
-  base.style.bottom = '1.5rem'
-} else {
-  base.style.top = '1.5rem'
-}
 document.body.appendChild(base)
 
 const mountPoint = document.createElement('div')
 mountPoint.id = 'wnj'
-mountPoint.classList.add('tw-animate-fadein')
 
 const style = document.createElement('style')
 style.innerHTML = styles
@@ -37,7 +29,8 @@ shadowRoot.appendChild(style)
 const app = new App({
   target: mountPoint,
   props: {
-    accent: win.wnjParams?.accent || 'cyan'
+    accent: win.wnjParams?.accent || 'cyan',
+    position: (win.wnjParams?.position === 'bottom') ? 'bottom' : 'top'
   }
 })
 
