@@ -182,7 +182,7 @@
   })
 
   function handleClick(ev: MouseEvent) {
-    if (hasMoved) {
+    if (Math.abs(ypos - yposStart) > 6 || Date.now() - clickStart > 600) {
       return
     }
 
@@ -312,7 +312,9 @@
     : parseInt(localStorage.getItem('wnj:ypos') || '0') || BASE_YPOS
   let dragStarted = false
   let hasMoved = false
-  let insidePosition: any
+  let insidePosition: number
+  let yposStart: number
+  let clickStart: number
   $: movingStyle = hasMoved
     ? 'tw-cursor-grabbing tw-outline-dashed tw-outline-' +
       accent +
@@ -324,23 +326,26 @@
     dragStarted = true
     const rect = myself.getBoundingClientRect()
     insidePosition = ev.clientY - rect.top
+    yposStart = ypos
+    clickStart = Date.now()
   }
 
   function handleMouseMove(ev: MouseEvent) {
     if (!dragStarted) return
+
     if (origin === 'top') {
       ypos = ev.clientY
     } else {
       ypos = window.innerHeight - ev.clientY
     }
     ypos -= insidePosition
+
     hasMoved = true
 
     // do not let the widget go outside the view
     if (ypos < BASE_YPOS) {
       ypos = BASE_YPOS
     }
-
     if (ypos > window.innerHeight - BASE_YPOS) {
       ypos = window.innerHeight - BASE_YPOS
     }
@@ -348,6 +353,7 @@
 
   function handleMouseUp() {
     dragStarted = false
+
     setTimeout(() => {
       hasMoved = false
     }, 10)
