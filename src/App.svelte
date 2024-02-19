@@ -186,6 +186,14 @@
       return
     }
 
+    if (connecting) {
+      // this could be because the popup window didn't open, so we try to open it again here
+      connect(
+        new BunkerSigner(clientSecret, bunkerPointer!, bunkerSignerParams)
+      )
+      return
+    }
+
     if (state === 'justopened' || state === 'justclosed') return
 
     if (ev.composedPath().find((el: any) => el.id === 'wnj')) open()
@@ -381,11 +389,7 @@
   }
 </script>
 
-<svelte:window
-  on:click={handleClick}
-  on:mouseup={handleMouseUp}
-  on:mousemove={handleMouseMove}
-/>
+<svelte:window on:click={handleClick} />
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->
 <div
@@ -398,6 +402,8 @@
     : right}px; user-select: none; {opened && $mobileMode
     ? 'bottom: 0px'
     : origin + ':' + ypos + 'px'}"
+  on:mouseup={handleMouseUp}
+  on:mousemove={handleMouseMove}
   on:mousedown={handleMouseDown}
   bind:this={myself}
 >
