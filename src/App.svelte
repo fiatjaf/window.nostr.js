@@ -13,7 +13,7 @@
     type BunkerSignerParams,
     createAccount,
     parseBunkerInput,
-    fetchCustodialBunkers,
+    fetchBunkerProviders,
     type BunkerPointer,
     type BunkerProfile,
     BUNKER_REGEX
@@ -223,7 +223,11 @@
     ev.preventDefault()
     creating = true
     if (providers.length === 0) {
-      providers = await fetchCustodialBunkers(pool, ['wss://relay.nostr.band'])
+      providers = await fetchBunkerProviders(pool, [
+        'wss://relay.nostr.band',
+        'wss://nos.lol',
+        'wss://nostr-pub.wellorder.net'
+      ])
       chosenProvider = providers[0]
     }
   }
