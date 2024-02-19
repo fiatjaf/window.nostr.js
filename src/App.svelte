@@ -301,7 +301,7 @@
   let dragStarted = false
   let hasMoved = false
   let insidePosition: any
-  $: movingStyle = dragStarted
+  $: movingStyle = hasMoved
     ? 'tw-cursor-grabbing tw-outline-dashed tw-outline-' +
       accent +
       '-500 tw-outline-1 tw-outline-offset-4'
