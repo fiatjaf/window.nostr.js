@@ -19,7 +19,7 @@ win.destroyWnj = () => {
 }
 
 const base = document.createElement('div')
-base.style.zIndex = '10000'
+base.style.zIndex = '90000'
 document.body.appendChild(base)
 
 const mountPoint = document.createElement('div')
