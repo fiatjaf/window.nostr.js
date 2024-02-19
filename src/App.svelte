@@ -314,6 +314,11 @@
     insidePosition = ev.clientY - rect.top
   }
 
+  function handleTouchStart(ev: TouchEvent) {
+    if (opened) return
+    mouseDown = true
+    const rect = myself.getBoundingClientRect()
+    insidePosition = ev.touches[0].clientY - rect.top
   }
 
   function handleMouseMove(ev: MouseEvent) {
@@ -332,6 +337,14 @@
     }
   }
 
+  function handleTouchMove(ev: TouchEvent) {
+    if (!mouseDown) return
+    if (origin === 'top') {
+      ypos = ev.touches[0].clientY
+    } else {
+      ypos = window.innerHeight - ev.touches[0].clientY
+    }
+    ypos -= insidePosition
     hasMoved = true
 
     // do not let the widget go outside the view
@@ -340,7 +353,7 @@
     }
   }
 
-  function handleMouseUp() {
+  function handleFinishMove() {
     mouseDown = false
     setTimeout(() => {
       hasMoved = false
@@ -370,8 +383,10 @@
 
 <svelte:window
   on:click={handleClick}
-  on:mouseup={handleMouseUp}
+  on:mouseup={handleFinishMove}
   on:mousemove={handleMouseMove}
+  on:touchend={handleFinishMove}
+  on:touchmove={handleTouchMove}
 />
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->
@@ -380,6 +395,7 @@
   class:tw-cursor-pointer={!connected && !opened}
   style="position: fixed; right: {right}px; {origin}: {ypos}px; user-select: none; "
   on:mousedown={handleMouseDown}
+  on:touchstart={handleTouchStart}
   bind:this={myself}
 >
   <!-- Close status ################### -->
