@@ -41,12 +41,12 @@
   let nameInputValue: string
   let chosenProvider: BunkerProfile | undefined
   let clientSecret: Uint8Array
-  const local = localStorage.getItem('nip46ClientSecretKey')
+  const local = localStorage.getItem('wnj:clientSecret')
   if (local) {
     clientSecret = hexToBytes(local)
   } else {
     clientSecret = generateSecretKey()
-    localStorage.setItem('nip46ClientSecretKey', bytesToHex(clientSecret))
+    localStorage.setItem('wnj:clientSecret', bytesToHex(clientSecret))
   }
 
   let state: 'opened' | 'closed' | 'justopened' | 'justclosed' = 'closed'
