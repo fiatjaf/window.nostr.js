@@ -24,7 +24,9 @@
 
   let myself: HTMLDivElement
   export let accent: string
-  export let position: string
+  export let position: 'top' | 'bottom' = 'top'
+  let origin: 'top' | 'bottom' =
+    (localStorage.getItem('wnj:origin') as 'top' | 'bottom' | null) || position
 
   const win = window as any
   const pool = new SimplePool()
@@ -292,8 +294,10 @@
     resolveBunker(bunker)
   }
 
+  const BASE_YPOS = 20
   export let right = 20
-  export let ypos = 20
+  export let ypos =
+    parseInt(localStorage.getItem('wnj:ypos') || '0') || BASE_YPOS
   let mouseDown = false
   let hasMoved = false
   $: movingStyle = mouseDown
@@ -302,20 +306,6 @@
       '-500 tw-outline-1 tw-outline-offset-4'
     : 'tw-outline-none'
 
-  function updatePosition() {
-    if (!myself) return false
-    const rect = myself.getBoundingClientRect()
-    const viewportHeight = window.innerHeight
-    const viewportMidpoint = viewportHeight / 2
-    if (rect.top < viewportMidpoint) {
-      position = 'top'
-      ypos = rect.top
-    } else {
-      position = 'bottom'
-      ypos = viewportHeight - rect.bottom
-    }
-  }
-
   function handleMouseDown(_: MouseEvent) {
     if (opened) return
     mouseDown = true
@@ -323,7 +313,7 @@
 
   function handleMouseMove(ev: MouseEvent) {
     if (!mouseDown) return
-    if (position === 'top') {
+    if (origin === 'top') {
       ypos = ev.clientY
     } else {
       ypos = window.innerHeight - ev.clientY
@@ -331,19 +321,36 @@
     hasMoved = true
 
     // do not let the widget go outside the view
-    if (ypos < 20) {
-      ypos = 20
+    if (ypos < BASE_YPOS) {
+      ypos = BASE_YPOS
     }
   }
 
   function handleMouseUp() {
-    if (mouseDown) {
-      updatePosition()
-    }
     mouseDown = false
     setTimeout(() => {
       hasMoved = false
     }, 10)
+
+    if (hasMoved) {
+      const rect = myself.getBoundingClientRect()
+      const viewportHeight = window.innerHeight
+      const viewportMidpoint = viewportHeight / 2
+      if (rect.top < viewportMidpoint) {
+        origin = 'top'
+        ypos = rect.top
+      } else {
+        origin = 'bottom'
+        ypos = viewportHeight - rect.bottom
+      }
+
+      if (ypos < BASE_YPOS) {
+        ypos = BASE_YPOS
+      }
+
+      localStorage.setItem('wnj:origin', origin)
+      localStorage.setItem('wnj:ypos', ypos.toString())
+    }
   }
 </script>
 
@@ -357,7 +364,7 @@
 <div
   class="tw-text-white tw-font-sans draggable tw-animate-fadein"
   class:tw-cursor-pointer={!connected && !opened}
-  style="position: fixed; right: {right}px; {position}: {ypos}px; user-select: none; "
+  style="position: fixed; right: {right}px; {origin}: {ypos}px; user-select: none; "
   on:mousedown={handleMouseDown}
   bind:this={myself}
 >
