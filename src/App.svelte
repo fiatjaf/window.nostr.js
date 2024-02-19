@@ -300,15 +300,20 @@
     parseInt(localStorage.getItem('wnj:ypos') || '0') || BASE_YPOS
   let mouseDown = false
   let hasMoved = false
+  let insidePosition: any
   $: movingStyle = mouseDown
     ? 'tw-cursor-grabbing tw-outline-dashed tw-outline-' +
       accent +
       '-500 tw-outline-1 tw-outline-offset-4'
     : 'tw-outline-none'
 
-  function handleMouseDown(_: MouseEvent) {
+  function handleMouseDown(ev: MouseEvent) {
     if (opened) return
     mouseDown = true
+    const rect = myself.getBoundingClientRect()
+    insidePosition = ev.clientY - rect.top
+  }
+
   }
 
   function handleMouseMove(ev: MouseEvent) {
@@ -318,6 +323,15 @@
     } else {
       ypos = window.innerHeight - ev.clientY
     }
+    ypos -= insidePosition
+    hasMoved = true
+
+    // do not let the widget go outside the view
+    if (ypos < BASE_YPOS) {
+      ypos = BASE_YPOS
+    }
+  }
+
     hasMoved = true
 
     // do not let the widget go outside the view
