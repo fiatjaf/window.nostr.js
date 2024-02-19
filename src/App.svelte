@@ -143,7 +143,7 @@
   }
 
   onMount(() => {
-    let data = localStorage.getItem('nip46BunkerPointer')
+    let data = localStorage.getItem('wnj:bunkerPointer')
     if (data) {
       bunkerPointer = JSON.parse(data)
       connecting = true
@@ -214,7 +214,7 @@
 
   async function handleDisconnect(ev: MouseEvent) {
     ev.preventDefault()
-    localStorage.removeItem('nip46BunkerPointer')
+    localStorage.removeItem('wnj:bunkerPointer')
     if (win.isWnj) delete win.nostr
     reset()
   }
@@ -265,6 +265,7 @@
 
   async function connect(bunker: BunkerSigner) {
     await bunker.connect()
+    bunkerPointer = bunker.bp
 
     // set this so the floating thing will update
     connected = {
@@ -274,7 +275,7 @@
     }
     connecting = false
 
-    localStorage.setItem('nip46BunkerPointer', JSON.stringify(bunkerPointer))
+    localStorage.setItem('wnj:bunkerPointer', JSON.stringify(bunkerPointer))
 
     // load metadata
     metadataSub = pool.subscribeMany(
