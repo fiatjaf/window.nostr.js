@@ -295,7 +295,6 @@
   export let right = 20
   export let ypos = 20
   let mouseDown = false
-  let insidePosition: number
   let hasMoved = false
   $: movingStyle = mouseDown
     ? 'tw-cursor-grabbing tw-outline-dashed tw-outline-' +
@@ -317,21 +316,21 @@
     }
   }
 
-  function handleMouseDown(ev: MouseEvent) {
+  function handleMouseDown(_: MouseEvent) {
+    if (opened) return
     mouseDown = true
-    const rect = myself.getBoundingClientRect()
-    insidePosition = ev.clientY - rect.top
   }
 
   function handleMouseMove(ev: MouseEvent) {
     if (!mouseDown) return
-    hasMoved = true
     if (position === 'top') {
       ypos = ev.clientY
     } else {
       ypos = window.innerHeight - ev.clientY
     }
-    ypos -= insidePosition
+    hasMoved = true
+
+    // do not let the widget go outside the view
     if (ypos < 20) {
       ypos = 20
     }
