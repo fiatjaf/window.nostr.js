@@ -12,6 +12,12 @@ import App from './App.svelte'
 
 const win = window as any
 
+win.destroyWnj = () => {
+  setTimeout(() => {
+    app.$destroy()
+  }, 1)
+}
+
 const base = document.createElement('div')
 base.style.zIndex = '10000'
 document.body.appendChild(base)
@@ -35,8 +41,3 @@ const app = new App({
 })
 
 export default app
-
-// ~
-;(window as any).destroyWnj = () => {
-  app.$destroy()
-}
