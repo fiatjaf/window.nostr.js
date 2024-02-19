@@ -335,6 +335,10 @@
     if (ypos < BASE_YPOS) {
       ypos = BASE_YPOS
     }
+
+    if (ypos > window.innerHeight - BASE_YPOS) {
+      ypos = window.innerHeight - BASE_YPOS
+    }
   }
 
   function handleTouchMove(ev: TouchEvent) {
@@ -350,6 +354,10 @@
     // do not let the widget go outside the view
     if (ypos < BASE_YPOS) {
       ypos = BASE_YPOS
+    }
+
+    if (ypos > window.innerHeight - BASE_YPOS) {
+      ypos = window.innerHeight - BASE_YPOS
     }
   }
 
