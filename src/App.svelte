@@ -21,12 +21,17 @@
   import {NIP05_REGEX, queryProfile} from 'nostr-tools/nip05'
   import {npubEncode} from 'nostr-tools/nip19'
   import {onMount} from 'svelte'
+  import mediaQueryStore from './mediaQueryStore.js'
+
+  const mobileMode = mediaQueryStore('only screen and (max-width: 640px)')
 
   let myself: HTMLDivElement
   export let accent: string
   export let position: 'top' | 'bottom' = 'top'
-  let origin: 'top' | 'bottom' =
-    (localStorage.getItem('wnj:origin') as 'top' | 'bottom' | null) || position
+  $: origin = $mobileMode
+    ? 'bottom'
+    : (localStorage.getItem('wnj:origin') as 'top' | 'bottom' | null) ||
+      position
 
   const win = window as any
   const pool = new SimplePool()
@@ -294,10 +299,13 @@
     resolveBunker(bunker)
   }
 
+  // $: console.log($mobileMode);
+
   const BASE_YPOS = 20
   export let right = 20
-  export let ypos =
-    parseInt(localStorage.getItem('wnj:ypos') || '0') || BASE_YPOS
+  $: ypos = $mobileMode
+    ? BASE_YPOS
+    : parseInt(localStorage.getItem('wnj:ypos') || '0') || BASE_YPOS
   let dragStarted = false
   let hasMoved = false
   let insidePosition: any
@@ -333,7 +341,6 @@
       ypos = window.innerHeight - BASE_YPOS
     }
   }
-
 
   function handleMouseUp() {
     dragStarted = false
@@ -373,7 +380,13 @@
 <div
   class="tw-text-white tw-font-sans draggable tw-animate-fadein"
   class:tw-cursor-pointer={!connected && !opened}
-  style="position: fixed; right: {right}px; {origin}: {ypos}px; user-select: none; "
+  style="position: fixed; {opened && $mobileMode
+    ? 'width: 100%;'
+    : ''}; right: {opened && $mobileMode
+    ? '0'
+    : right}px; user-select: none; {opened && $mobileMode
+    ? 'bottom: 0px'
+    : origin + ':' + ypos + 'px'}"
   on:mousedown={handleMouseDown}
   bind:this={myself}
 >
@@ -407,7 +420,7 @@
     <!-- Open status ################### -->
   {:else}
     <div
-      class="tw-w-60 sm:tw-w-80 tw-px-6 tw-py-8 tw-bg-{accent}-700 tw-rounded-md tw-shadow-[0_0px_30px_0px_rgba(0,0,0,0.6)] tw-transition-all tw-animate-show {movingStyle}"
+      class="sm:tw-w-80 tw-px-6 tw-py-8 tw-bg-{accent}-700 tw-rounded-md tw-shadow-[0_0px_30px_0px_rgba(0,0,0,0.6)] tw-transition-all tw-animate-show {movingStyle}"
     >
       <button
         on:click={handleCloseModal}
