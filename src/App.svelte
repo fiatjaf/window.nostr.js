@@ -319,7 +319,7 @@
     }
   }
 
-  function onMouseDown(ev: MouseEvent) {
+  function handleMouseDown(ev: MouseEvent) {
     mouseDown = true
     timeoutId = setTimeout(() => {
       moving = true
@@ -328,7 +328,7 @@
     }, 600)
   }
 
-  function onMouseMove(ev: MouseEvent) {
+  function handleMouseMove(ev: MouseEvent) {
     if (!mouseDown || !moving) return
 
     if ((position = 'top')) {
@@ -339,7 +339,7 @@
     ypos -= insidePosition
   }
 
-  function onMouseUp() {
+  function handleMouseUp() {
     if (moving) {
       updatePosition()
     }
@@ -353,8 +353,8 @@
 
 <svelte:window
   on:click={handleClick}
-  on:mouseup={onMouseUp}
-  on:mousemove={onMouseMove}
+  on:mouseup={handleMouseUp}
+  on:mousemove={handleMouseMove}
 />
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->
@@ -362,7 +362,7 @@
   class="tw-text-white tw-font-sans draggable tw-animate-fadein"
   class:tw-cursor-pointer={!connected && !opened}
   style="position: {positionStyle}; right: {right}px; {position}: {ypos}px; user-select: none; "
-  on:mousedown={onMouseDown}
+  on:mousedown={handleMouseDown}
   bind:this={myself}
 >
   <!-- Close status ################### -->
