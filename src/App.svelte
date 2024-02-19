@@ -298,10 +298,10 @@
   export let right = 20
   export let ypos =
     parseInt(localStorage.getItem('wnj:ypos') || '0') || BASE_YPOS
-  let mouseDown = false
+  let dragStarted = false
   let hasMoved = false
   let insidePosition: any
-  $: movingStyle = mouseDown
+  $: movingStyle = dragStarted
     ? 'tw-cursor-grabbing tw-outline-dashed tw-outline-' +
       accent +
       '-500 tw-outline-1 tw-outline-offset-4'
@@ -309,20 +309,20 @@
 
   function handleMouseDown(ev: MouseEvent) {
     if (opened) return
-    mouseDown = true
+    dragStarted = true
     const rect = myself.getBoundingClientRect()
     insidePosition = ev.clientY - rect.top
   }
 
   function handleTouchStart(ev: TouchEvent) {
     if (opened) return
-    mouseDown = true
+    dragStarted = true
     const rect = myself.getBoundingClientRect()
     insidePosition = ev.touches[0].clientY - rect.top
   }
 
   function handleMouseMove(ev: MouseEvent) {
-    if (!mouseDown) return
+    if (!dragStarted) return
     if (origin === 'top') {
       ypos = ev.clientY
     } else {
@@ -338,7 +338,7 @@
   }
 
   function handleTouchMove(ev: TouchEvent) {
-    if (!mouseDown) return
+    if (!dragStarted) return
     if (origin === 'top') {
       ypos = ev.touches[0].clientY
     } else {
@@ -354,7 +354,7 @@
   }
 
   function handleFinishMove() {
-    mouseDown = false
+    dragStarted = false
     setTimeout(() => {
       hasMoved = false
     }, 10)
