@@ -175,7 +175,7 @@
   })
 
   function handleClick(ev: MouseEvent) {
-    if (moving) {
+    if (hasMoved) {
       return
     }
 
@@ -294,12 +294,10 @@
 
   export let right = 20
   export let ypos = 20
-  let moving = false
   let mouseDown = false
-  let timeoutId: any
-  let insidePosition: any
-  $: positionStyle = moving ? 'absolute' : 'fixed'
-  $: movingStyle = moving
+  let insidePosition: number
+  let hasMoved = false
+  $: movingStyle = mouseDown
     ? 'tw-cursor-grabbing tw-outline-dashed tw-outline-' +
       accent +
       '-500 tw-outline-1 tw-outline-offset-4'
@@ -321,33 +319,32 @@
 
   function handleMouseDown(ev: MouseEvent) {
     mouseDown = true
-    timeoutId = setTimeout(() => {
-      moving = true
-      const rect = myself.getBoundingClientRect()
-      insidePosition = ev.clientY - rect.top
-    }, 600)
+    const rect = myself.getBoundingClientRect()
+    insidePosition = ev.clientY - rect.top
   }
 
   function handleMouseMove(ev: MouseEvent) {
-    if (!mouseDown || !moving) return
-
-    if ((position = 'top')) {
+    if (!mouseDown) return
+    hasMoved = true
+    if (position === 'top') {
       ypos = ev.clientY
     } else {
       ypos = window.innerHeight - ev.clientY
     }
     ypos -= insidePosition
+    if (ypos < 20) {
+      ypos = 20
+    }
   }
 
   function handleMouseUp() {
-    if (moving) {
+    if (mouseDown) {
       updatePosition()
     }
     mouseDown = false
-    clearTimeout(timeoutId)
     setTimeout(() => {
-      moving = false
-    }, 200)
+      hasMoved = false
+    }, 10)
   }
 </script>
 
@@ -361,7 +358,7 @@
 <div
   class="tw-text-white tw-font-sans draggable tw-animate-fadein"
   class:tw-cursor-pointer={!connected && !opened}
-  style="position: {positionStyle}; right: {right}px; {position}: {ypos}px; user-select: none; "
+  style="position: fixed; right: {right}px; {position}: {ypos}px; user-select: none; "
   on:mousedown={handleMouseDown}
   bind:this={myself}
 >
