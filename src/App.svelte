@@ -22,7 +22,7 @@
   import {npubEncode} from 'nostr-tools/nip19'
   import {onMount} from 'svelte'
 
-  let myself
+  let myself: HTMLDivElement
   export let accent: string
   export let position: string
 
@@ -319,22 +319,22 @@
     }
   }
 
-  function onMouseDown(e) {
+  function onMouseDown(ev: MouseEvent) {
     mouseDown = true
     timeoutId = setTimeout(() => {
       moving = true
       const rect = myself.getBoundingClientRect()
-      insidePosition = e.clientY - rect.top
+      insidePosition = ev.clientY - rect.top
     }, 600)
   }
 
-  function onMouseMove(e) {
+  function onMouseMove(ev: MouseEvent) {
     if (!mouseDown || !moving) return
 
     if ((position = 'top')) {
-      ypos = e.clientY
+      ypos = ev.clientY
     } else {
-      ypos = window.innerHeight - e.clientY
+      ypos = window.innerHeight - ev.clientY
     }
     ypos -= insidePosition
   }
