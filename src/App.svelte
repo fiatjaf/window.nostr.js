@@ -68,10 +68,36 @@
   let metadataSub: SubCloser | null
   let providers: BunkerProfile[] = []
 
+  const BASE_YPOS = 20
+  export let right = 20
+  $: ypos = $mobileMode
+    ? BASE_YPOS
+    : parseInt(localStorage.getItem('wnj:ypos') || '0') || BASE_YPOS
+  let dragStarted = false
+  let hasMoved = false
+  let insidePosition: number
+  let yposStart: number
+  let clickStart: number
+
+  $: opened = state === 'justopened' || state === 'opened'
+
+  $: movingStyle = hasMoved
+    ? 'tw-cursor-grabbing tw-outline-dashed tw-outline-' +
+      accent +
+      '-500 tw-outline-1 tw-outline-offset-4'
+    : 'tw-outline-none'
+
   $: bunkerInputValueIsGood =
     bunkerInputValue &&
     (bunkerInputValue.match(BUNKER_REGEX) ||
       bunkerInputValue.match(NIP05_REGEX))
+
+  const bunkerSignerParams: BunkerSignerParams = {
+    pool,
+    onauth(url: string) {
+      window.open(url, 'window.nostr', `width=600,height=800,popup=yes`)
+    }
+  }
 
   const delayedUpdateState = debounce(() => {
     switch (state) {
@@ -93,8 +119,6 @@
     state = 'justclosed'
     delayedUpdateState()
   }
-
-  $: opened = state === 'justopened' || state === 'opened'
 
   reset()
 
@@ -136,13 +160,6 @@
     creating = false
     connected = null
     metadataSub = null
-  }
-
-  const bunkerSignerParams: BunkerSignerParams = {
-    pool,
-    onauth(url: string) {
-      window.open(url, 'window.nostr', `width=600,height=800,popup=yes`)
-    }
   }
 
   onMount(() => {
@@ -273,7 +290,7 @@
   }
 
   async function connect(bunker: BunkerSigner) {
-    let connectionTimeout
+    let connectionTimeout: number
 
     function allowCancel() {
       longConnecting = true
@@ -325,24 +342,6 @@
     close()
     resolveBunker(bunker)
   }
-
-  // $: console.log($mobileMode);
-
-  const BASE_YPOS = 20
-  export let right = 20
-  $: ypos = $mobileMode
-    ? BASE_YPOS
-    : parseInt(localStorage.getItem('wnj:ypos') || '0') || BASE_YPOS
-  let dragStarted = false
-  let hasMoved = false
-  let insidePosition: number
-  let yposStart: number
-  let clickStart: number
-  $: movingStyle = hasMoved
-    ? 'tw-cursor-grabbing tw-outline-dashed tw-outline-' +
-      accent +
-      '-500 tw-outline-1 tw-outline-offset-4'
-    : 'tw-outline-none'
 
   function handleMouseDown(ev: MouseEvent) {
     if (opened) return
