@@ -22,6 +22,7 @@
   import {npubEncode} from 'nostr-tools/nip19'
   import {onMount} from 'svelte'
   import mediaQueryStore from './mediaQueryStore.js'
+  import Spinner from './Spinner.svelte'
 
   const mobileMode = mediaQueryStore('only screen and (max-width: 640px)')
 
@@ -54,6 +55,8 @@
   let resolveBunker: (_: BunkerSigner) => void
   let bunker: Promise<BunkerSigner>
   let connecting: boolean
+  let longConnecting = false
+  let cancelConnection = false
   let creating: boolean
   let connected: null | {
     pubkey: string
@@ -146,7 +149,6 @@
     let data = localStorage.getItem('wnj:bunkerPointer')
     if (data) {
       bunkerPointer = JSON.parse(data)
-      connecting = true
       connect(
         new BunkerSigner(clientSecret, bunkerPointer!, bunkerSignerParams)
       )
@@ -183,14 +185,6 @@
 
   function handleClick(ev: MouseEvent) {
     if (Math.abs(ypos - yposStart) > 6 || Date.now() - clickStart > 600) {
-      return
-    }
-
-    if (connecting) {
-      // this could be because the popup window didn't open, so we try to open it again here
-      connect(
-        new BunkerSigner(clientSecret, bunkerPointer!, bunkerSignerParams)
-      )
       return
     }
 
@@ -271,9 +265,28 @@
     }
   }, 500)
 
+  function handleAbortConnection() {
+    longConnecting = false
+    connecting = false
+    cancelConnection = true
+    // TODO: Effectively abort the connection
+  }
+
   async function connect(bunker: BunkerSigner) {
+    let connectionTimeout
+
+    function allowCancel() {
+      longConnecting = true
+      opened = true
+      clearTimeout(connectionTimeout)
+    }
+
     connecting = true
+    connectionTimeout = setTimeout(allowCancel, 5000)
+
     await bunker.connect()
+
+    clearTimeout(connectionTimeout)
     bunkerPointer = bunker.bp
 
     // set this so the floating thing will update
@@ -308,6 +321,7 @@
       }
     )
     connecting = false
+    longConnecting = false
     close()
     resolveBunker(bunker)
   }
@@ -414,7 +428,10 @@
     >
       <!-- Connecting view ################### -->
       {#if connecting}
-        <div>Connecting to bunker...</div>
+        <div class="tw-flex tw-items-center">
+          Connecting to bunker
+          <Spinner />
+        </div>
       {:else if !connected}
         Connect with Nostr
       {:else}
@@ -504,21 +521,38 @@
             bind:this={bunkerInput}
             bind:value={bunkerInputValue}
             autofocus
+            disabled={connecting}
           />
           <button
-            class="tw-block tw-w-full tw-mt-4 tw-px-2 tw-py-1 tw-text-lg tw-rounded tw-border-0 tw-bg-{accent}-900 hover:tw-bg-{accent}-950 tw-hover:bg-indigo-900 tw-cursor-pointer tw-text-white disabled:tw-bg-neutral-400 disabled:tw-text-neutral-200 disabled:tw-cursor-default"
+            class="tw-flex tw-w-full tw-mt-4 tw-px-2 tw-py-1 tw-text-lg tw-rounded tw-border-0 tw-bg-{accent}-900 hover:tw-bg-{accent}-950 tw-hover:bg-indigo-900 tw-cursor-pointer tw-text-white disabled:tw-bg-neutral-400 disabled:tw-text-neutral-200 disabled:tw-cursor-default tw-items-center tw-justify-center"
             disabled={!bunkerInputValueIsGood || connecting}
           >
-            {connecting ? 'Connecting to bunker...' : 'Connect »'}
+            {#if connecting}
+              Connecting to bunker
+              <Spinner />
+            {:else}
+              Connect »
+            {/if}
           </button>
+          {#if connecting && longConnecting}
+            <div class="tw-mt-6 tw-text-center tw-text-sm tw-leading-3">
+              Waiting too much?
+              <button
+                class="tw-border-0 tw-bg-transparent tw-text-white tw-cursor-pointer tw-underline tw-text-sm"
+                on:click={handleAbortConnection}>Cancel the connection</button
+              >
+            </div>
+          {/if}
         </form>
-        <div class="tw-mt-6 tw-text-center tw-text-sm tw-leading-3">
-          Do you need a Nostr account?<br />
-          <button
-            class="tw-border-0 tw-bg-transparent tw-text-white tw-cursor-pointer tw-underline tw-text-sm"
-            on:click={handleOpenCreate}>Sign up now</button
-          >
-        </div>
+        {#if !connecting}
+          <div class="tw-mt-6 tw-text-center tw-text-sm tw-leading-3">
+            Do you need a Nostr account?<br />
+            <button
+              class="tw-border-0 tw-bg-transparent tw-text-white tw-cursor-pointer tw-underline tw-text-sm"
+              on:click={handleOpenCreate}>Sign up now</button
+            >
+          </div>
+        {/if}
 
         <!-- Connected view ################### -->
       {:else if connected}
