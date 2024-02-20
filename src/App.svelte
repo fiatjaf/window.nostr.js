@@ -272,6 +272,7 @@
   }, 500)
 
   async function connect(bunker: BunkerSigner) {
+    connecting = true
     await bunker.connect()
     bunkerPointer = bunker.bp
 
@@ -281,7 +282,6 @@
       npub: npubEncode(bunker.bp.pubkey),
       event: null
     }
-    connecting = false
 
     localStorage.setItem('wnj:bunkerPointer', JSON.stringify(bunkerPointer))
 
@@ -307,7 +307,7 @@
         }
       }
     )
-
+    connecting = false
     close()
     resolveBunker(bunker)
   }
@@ -507,9 +507,9 @@
           />
           <button
             class="tw-block tw-w-full tw-mt-4 tw-px-2 tw-py-1 tw-text-lg tw-rounded tw-border-0 tw-bg-{accent}-900 hover:tw-bg-{accent}-950 tw-hover:bg-indigo-900 tw-cursor-pointer tw-text-white disabled:tw-bg-neutral-400 disabled:tw-text-neutral-200 disabled:tw-cursor-default"
-            disabled={!bunkerInputValueIsGood}
+            disabled={!bunkerInputValueIsGood || connecting}
           >
-            Connect »
+            {connecting ? "Connecting to bunker..." : "Connect »"}
           </button>
         </form>
         <div class="tw-mt-6 tw-text-center tw-text-sm tw-leading-3">
