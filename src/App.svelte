@@ -416,7 +416,7 @@
       {#if connecting}
         <div>Connecting to bunker...</div>
       {:else if !connected}
-        Login with Nostr
+        Connect with Nostr
       {:else}
         <div class="tw-flex tw-items-center">
           {#if connected.picture}
@@ -509,7 +509,7 @@
             class="tw-block tw-w-full tw-mt-4 tw-px-2 tw-py-1 tw-text-lg tw-rounded tw-border-0 tw-bg-{accent}-900 hover:tw-bg-{accent}-950 tw-hover:bg-indigo-900 tw-cursor-pointer tw-text-white disabled:tw-bg-neutral-400 disabled:tw-text-neutral-200 disabled:tw-cursor-default"
             disabled={!bunkerInputValueIsGood || connecting}
           >
-            {connecting ? "Connecting to bunker..." : "Connect »"}
+            {connecting ? 'Connecting to bunker...' : 'Connect »'}
           </button>
         </form>
         <div class="tw-mt-6 tw-text-center tw-text-sm tw-leading-3">
