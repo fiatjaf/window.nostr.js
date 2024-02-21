@@ -402,7 +402,11 @@
   }
 </script>
 
-<svelte:window on:click={handleClick} />
+<svelte:window
+  on:click={handleClick}
+  on:mouseup={handleMouseUp}
+  on:mousemove={handleMouseMove}
+/>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->
 <div
@@ -415,8 +419,6 @@
     : right}px; user-select: none; {opened && $mobileMode
     ? 'bottom: 0px'
     : origin + ':' + ypos + 'px'}"
-  on:mouseup={handleMouseUp}
-  on:mousemove={handleMouseMove}
   on:mousedown={handleMouseDown}
   bind:this={myself}
 >
