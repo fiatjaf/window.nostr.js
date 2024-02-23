@@ -58,6 +58,7 @@
   let longConnecting = false
   let cancelConnection = false
   let creating: boolean
+  let errorMessage: string
   let connected: null | {
     pubkey: string
     npub: string
@@ -67,6 +68,8 @@
   }
   let metadataSub: SubCloser | null
   let providers: BunkerProfile[] = []
+  const connectBunkerError = 'We could not connect to a NIP-46 bunker with that url, are you sure it is set up correctly?'
+  const connectNip05Error = 'We were not able to connect using this NIP-05 address, are you sure it is enabled to NIP-46? Ask your provider!'
 
   const BASE_YPOS = 20
   export let right = 20
@@ -160,6 +163,7 @@
     creating = false
     connected = null
     metadataSub = null
+    cleanError()
   }
 
   onMount(() => {
@@ -219,16 +223,28 @@
 
   async function handleConnect(ev: SubmitEvent) {
     ev.preventDefault()
-    bunkerPointer = await parseBunkerInput(bunkerInput.value)
-    if (!bunkerPointer) {
-      bunkerInput.setCustomValidity(
-        'invalid NIP-05 "name@domain.com" address or bunker:// URI'
-      )
-      return
-    }
+    try {
+      bunkerPointer = await parseBunkerInput(bunkerInput.value)
+      if (!bunkerPointer) {
+        if (bunkerInput.value.match(BUNKER_REGEX)) {
+          showError(connectBunkerError)
+        } else {
+          showError(connectNip05Error)
+        }
+        return
+      }
 
-    bunkerInput.setCustomValidity('')
-    connect(new BunkerSigner(clientSecret, bunkerPointer!, bunkerSignerParams))
+      bunkerInput.setCustomValidity('')
+      cleanError()
+      await connect(new BunkerSigner(clientSecret, bunkerPointer!, bunkerSignerParams))
+    } catch (error) {
+      if (bunkerInput.value.match(BUNKER_REGEX)) {
+        showError(connectBunkerError)
+      } else {
+        showError(connectNip05Error)
+      }
+      reset()
+    }
   }
 
   async function handleDisconnect(ev: MouseEvent) {
@@ -341,6 +357,14 @@
     longConnecting = false
     close()
     resolveBunker(bunker)
+  }
+
+  function showError(err: string) {
+    errorMessage = err
+  }
+
+  function cleanError() {
+    errorMessage = ''
   }
 
   function handleMouseDown(ev: MouseEvent) {
@@ -524,6 +548,11 @@
             autofocus
             disabled={connecting}
           />
+          {#if errorMessage}
+            <div class="tw-my-2 tw-p-2 tw-text-sm tw-leading-4 tw-text-red-400  tw-bg-yellow-100 tw-rounded">
+              {errorMessage}
+            </div>
+          {/if}
           <button
             class="tw-flex tw-w-full tw-mt-4 tw-px-2 tw-py-1 tw-text-lg tw-rounded tw-border-0 tw-bg-{accent}-900 hover:tw-bg-{accent}-950 tw-hover:bg-indigo-900 tw-cursor-pointer tw-text-white disabled:tw-bg-neutral-400 disabled:tw-text-neutral-200 disabled:tw-cursor-default tw-items-center tw-justify-center"
             disabled={!bunkerInputValueIsGood || connecting}
