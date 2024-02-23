@@ -243,7 +243,7 @@
       } else {
         showError(connectNip05Error)
       }
-      reset()
+      connecting = false
     }
   }
 
