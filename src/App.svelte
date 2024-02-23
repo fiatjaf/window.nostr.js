@@ -68,8 +68,10 @@
   }
   let metadataSub: SubCloser | null
   let providers: BunkerProfile[] = []
-  const connectBunkerError = 'We could not connect to a NIP-46 bunker with that url, are you sure it is set up correctly?'
-  const connectNip05Error = 'We were not able to connect using this NIP-05 address, are you sure it is enabled to NIP-46? Ask your provider!'
+  const connectBunkerError =
+    'We could not connect to a NIP-46 bunker with that url, are you sure it is set up correctly?'
+  const connectNip05Error =
+    'We were not able to connect using this address. For it to work it has to come from a NIP-46 provider.'
 
   const BASE_YPOS = 20
   export let right = 20
@@ -236,7 +238,9 @@
 
       bunkerInput.setCustomValidity('')
       cleanError()
-      await connect(new BunkerSigner(clientSecret, bunkerPointer!, bunkerSignerParams))
+      await connect(
+        new BunkerSigner(clientSecret, bunkerPointer!, bunkerSignerParams)
+      )
     } catch (error) {
       if (bunkerInput.value.match(BUNKER_REGEX)) {
         showError(connectBunkerError)
@@ -549,7 +553,9 @@
             disabled={connecting}
           />
           {#if errorMessage}
-            <div class="tw-my-2 tw-p-2 tw-text-sm tw-leading-4 tw-text-red-400  tw-bg-yellow-100 tw-rounded">
+            <div
+              class="tw-my-2 tw-p-2 tw-text-sm tw-leading-4 tw-text-red-400 tw-bg-yellow-100 tw-rounded"
+            >
               {errorMessage}
             </div>
           {/if}
