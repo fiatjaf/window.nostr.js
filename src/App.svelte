@@ -53,11 +53,11 @@
   let state: 'opened' | 'closed' | 'justopened' | 'justclosed' = 'closed'
   let bunkerPointer: BunkerPointer | null
   let resolveBunker: (_: BunkerSigner) => void
+  let rejectBunker: (_: string) => void
   let bunker: Promise<BunkerSigner>
   let connecting: boolean
   let connected: boolean
   let takingTooLong = false
-  let cancelConnection = false
   let creating: boolean
   let errorMessage: string
   let identity: null | {
@@ -128,9 +128,7 @@
 
   function connectOrOpen() {
     if (bunkerPointer && !connected) {
-      connect(
-        new BunkerSigner(clientSecret, bunkerPointer!, bunkerSignerParams)
-      )
+      connect()
       return
     }
     open()
@@ -170,8 +168,9 @@
   function reset() {
     close()
     bunkerPointer = null
-    bunker = new Promise(resolve => {
+    bunker = new Promise((resolve, reject) => {
       resolveBunker = resolve
+      rejectBunker = reject
     })
     identity = null
     connecting = false
@@ -253,10 +252,11 @@
 
       bunkerInput.setCustomValidity('')
       errorMessage = ''
+      await connect()
+
+      // since we are connecting right now after the user has typed stuff
+      // wait until the connection has succeeded before loading user data
       identify()
-      await connect(
-        new BunkerSigner(clientSecret, bunkerPointer!, bunkerSignerParams)
-      )
     } catch (error) {
       if (bunkerInput.value.match(BUNKER_REGEX)) {
         errorMessage = connectBunkerError
@@ -322,11 +322,12 @@
   function handleAbortConnection() {
     takingTooLong = false
     connecting = false
-    cancelConnection = true
-    // TODO: Effectively abort the connection
+    rejectBunker('connection aborted')
+    reset()
   }
 
-  async function connect(bunker: BunkerSigner) {
+  async function connect(b: BunkerSigner | undefined = undefined) {
+    b = b || new BunkerSigner(clientSecret, bunkerPointer!, bunkerSignerParams)
     connecting = true
 
     let connectionTimeout = setTimeout(() => {
@@ -334,16 +335,20 @@
       opened = true
     }, 5000)
 
-    await bunker.connect()
-
-    clearTimeout(connectionTimeout)
-    localStorage.setItem('wnj:bunkerPointer', JSON.stringify(bunkerPointer))
-
-    connected = true
-    connecting = false
-    takingTooLong = false
-    close()
-    resolveBunker(bunker)
+    try {
+      await b.connect()
+      connected = true
+      localStorage.setItem('wnj:bunkerPointer', JSON.stringify(bunkerPointer))
+      close()
+      resolveBunker(b)
+    } catch (err: any) {
+      rejectBunker(err?.message || String(err))
+    } finally {
+      // this still gets executed even if we return above
+      clearTimeout(connectionTimeout)
+      connecting = false
+      takingTooLong = false
+    }
   }
 
   function identify() {
