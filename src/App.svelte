@@ -60,6 +60,7 @@
   let takingTooLong = false
   let creating: boolean
   let errorMessage: string
+  let showInfo = false
   let identity: null | {
     pubkey: string
     npub: string
@@ -234,6 +235,16 @@
   function handleCloseModal(ev: MouseEvent) {
     close()
     creating = false
+    ev.stopPropagation()
+  }
+
+  function handleShowInfo(ev: MouseEvent) {
+    showInfo = true
+    ev.stopPropagation()
+  }
+
+  function handleCloseInfo(ev: MouseEvent) {
+    showInfo = false
     ev.stopPropagation()
   }
 
@@ -498,10 +509,49 @@
       class="sm:w-96 px-8 py-8 bg-gradient-to-b from-{accent}-900 to-{accent}-700 rounded-md shadow-[0_0px_30px_0px_rgba(0,0,0,0.6)] transition-all animate-show {movingStyle}"
     >
       <button
-        on:click={handleCloseModal}
+        on:click={showInfo ? handleCloseInfo : handleCloseModal}
         class="absolute top-0 right-2 bg-transparent cursor-pointer text-{accent}-600 text-3xl"
         >⤫</button
       >
+
+      {#if !showInfo}
+        <button
+          on:click={handleShowInfo}
+          class="absolute bottom-1 right-3 bg-transparent cursor-pointer text-{accent}-600 text-xl"
+          >?</button
+        >
+      {/if}
+
+      <!-- Show info ################### -->
+      {#if showInfo}
+        <div class="text-lg text-center">What is that?</div>
+        <div class="leading-5 text-base">
+          <p class="mt-4 mb">
+            This widget is created with <i>window.nostr.js</i>, a small script
+            you can drop in any page that already uses NIP-07 and make it also
+            work with NIP-46 automatically when the user doesn't have an
+            extension installed.
+            <br />
+            It adds a small floating button on the side of the window that users
+            can use to create Nostr accuonts or connect to their NIP-46 bunkers.
+          </p>
+          <p class="mt-4">
+            This tool is opensource, get the code from the <a
+              target="_blank"
+              class="underline"
+              href="https://github.com/fiatjaf/window.nostr.js"
+              >project's page</a
+            >.
+          </p>
+          <p class="mt-4">
+            You don't know what Nostr is?
+            <a target="_blank" class="underline" href="https://www.nostr.com"
+              >Learn more</a
+            >.
+          </p>
+        </div>
+      {/if}
+
       <!-- Create account view ################### -->
       {#if creating}
         <div class="text-lg text-center">Create a Nostr account</div>
@@ -550,7 +600,7 @@
         </div>
 
         <!-- Login view ################### -->
-      {:else if !identity}
+      {:else if !identity && !showInfo}
         <div class="text-lg text-center">
           How do you want to connect to Nostr?
         </div>
@@ -612,9 +662,7 @@
             class="text-white no-underline group"
           >
             {#if identity.picture || identity.name}
-              <div
-                class="flex items-center justify-center gap-2 mb-2"
-              >
+              <div class="flex items-center justify-center gap-2 mb-2">
                 {#if identity.picture}
                   <img
                     src={identity.picture}
