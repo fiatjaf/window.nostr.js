@@ -270,7 +270,6 @@
   async function handleDisconnect(ev: MouseEvent) {
     ev.preventDefault()
     localStorage.removeItem('wnj:bunkerPointer')
-    if (win.isWnj) delete win.nostr
     reset()
   }
 
