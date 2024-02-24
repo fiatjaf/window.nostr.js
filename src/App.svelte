@@ -495,7 +495,7 @@
     <!-- Open status ################### -->
   {:else}
     <div
-      class="sm:tw-w-96 tw-px-6 tw-py-8 tw-bg-gradient-to-b tw-from-{accent}-900 tw-to-{accent}-700 tw-rounded-md tw-shadow-[0_0px_30px_0px_rgba(0,0,0,0.6)] tw-transition-all tw-animate-show {movingStyle}"
+      class="sm:tw-w-96 tw-px-8 tw-py-8 tw-bg-gradient-to-b tw-from-{accent}-900 tw-to-{accent}-700 tw-rounded-md tw-shadow-[0_0px_30px_0px_rgba(0,0,0,0.6)] tw-transition-all tw-animate-show {movingStyle}"
     >
       <button
         on:click={handleCloseModal}
