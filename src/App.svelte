@@ -646,13 +646,3 @@
     </div>
   {/if}
 </div>
-
-<!-- hack to preload tailwind colors:
-tw-bg-cyan-700 tw-bg-cyan-800 tw-bg-cyan-900 tw-bg-cyan-950 tw-text-cyan-950 tw-outline-cyan-500
-tw-bg-green-700 tw-bg-green-800 tw-bg-green-900 tw-bg-green-950 tw-text-green-950 tw-outline-green-500
-tw-bg-purple-700 tw-bg-purple-800 tw-bg-purple-900 tw-bg-purple-950 tw-text-purple-950 tw-outline-purple-500
-tw-bg-red-700 tw-bg-red-800 tw-bg-red-900 tw-bg-red-950 tw-text-red-950 tw-outline-red-500
-tw-bg-orange-700 tw-bg-orange-800 tw-bg-orange-900 tw-bg-orange-950 tw-text-orange-950 tw-outline-orange-500
-tw-bg-neutral-700 tw-bg-neutral-800 tw-bg-neutral-900 tw-bg-neutral-950 tw-text-neutral-950 tw-outline-neutral-500
-tw-bg-stone-700 tw-bg-stone-800 tw-bg-stone-900 tw-bg-stone-950 tw-text-stone-950 tw-outline-stone-500
--->
