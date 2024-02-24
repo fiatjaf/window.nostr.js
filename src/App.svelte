@@ -55,11 +55,12 @@
   let resolveBunker: (_: BunkerSigner) => void
   let bunker: Promise<BunkerSigner>
   let connecting: boolean
-  let longConnecting = false
+  let connected: boolean
+  let takingTooLong = false
   let cancelConnection = false
   let creating: boolean
   let errorMessage: string
-  let connected: null | {
+  let identity: null | {
     pubkey: string
     npub: string
     name?: string
@@ -125,31 +126,42 @@
     delayedUpdateState()
   }
 
+  function connectOrOpen() {
+    if (bunkerPointer && !connected) {
+      connect(
+        new BunkerSigner(clientSecret, bunkerPointer!, bunkerSignerParams)
+      )
+      return
+    }
+    open()
+  }
+
   reset()
 
   let windowNostr = {
     isWnj: true,
     async getPublicKey(): Promise<string> {
+      if (bunkerPointer) return bunkerPointer.pubkey
       if (!connecting && !connected) open()
       return (await bunker).bp.pubkey
     },
     async signEvent(event: NostrEvent): Promise<VerifiedEvent> {
-      if (!connecting && !connected) open()
+      if (!connecting && !connected) connectOrOpen()
       return (await bunker).signEvent(event)
     },
     async getRelays(): Promise<{
       [url: string]: {read: boolean; write: boolean}
     }> {
-      if (!connecting && !connected) open()
+      if (!connecting && !connected) connectOrOpen()
       return (await bunker).getRelays()
     },
     nip04: {
       async encrypt(pubkey: string, plaintext: string): Promise<string> {
-        if (!connecting && !connected) open()
+        if (!connecting && !connected) connectOrOpen()
         return (await bunker).nip04Encrypt(pubkey, plaintext)
       },
       async decrypt(pubkey: string, ciphertext: string): Promise<string> {
-        if (!connecting && !connected) open()
+        if (!connecting && !connected) connectOrOpen()
         return (await bunker).nip04Decrypt(pubkey, ciphertext)
       }
     }
@@ -161,20 +173,23 @@
     bunker = new Promise(resolve => {
       resolveBunker = resolve
     })
+    identity = null
     connecting = false
+    takingTooLong = false
     creating = false
-    connected = null
+    connected = false
     metadataSub = null
-    cleanError()
+    errorMessage = ''
   }
 
   onMount(() => {
     let data = localStorage.getItem('wnj:bunkerPointer')
     if (data) {
       bunkerPointer = JSON.parse(data)
-      connect(
-        new BunkerSigner(clientSecret, bunkerPointer!, bunkerSignerParams)
-      )
+      // we have a pointer, which means we can get the public key right away
+      // but we will only try to connect when any other method is called on window.nostr
+
+      identify()
     }
 
     if (win.nostr && !win.nostr.isWnj) {
@@ -229,23 +244,24 @@
       bunkerPointer = await parseBunkerInput(bunkerInput.value)
       if (!bunkerPointer) {
         if (bunkerInput.value.match(BUNKER_REGEX)) {
-          showError(connectBunkerError)
+          errorMessage = connectBunkerError
         } else {
-          showError(connectNip05Error)
+          errorMessage = connectNip05Error
         }
         return
       }
 
       bunkerInput.setCustomValidity('')
-      cleanError()
+      errorMessage = ''
+      identify()
       await connect(
         new BunkerSigner(clientSecret, bunkerPointer!, bunkerSignerParams)
       )
     } catch (error) {
       if (bunkerInput.value.match(BUNKER_REGEX)) {
-        showError(connectBunkerError)
+        errorMessage = connectBunkerError
       } else {
-        showError(connectNip05Error)
+        errorMessage = connectNip05Error
       }
       connecting = false
     }
@@ -289,6 +305,8 @@
     open()
     creating = false
 
+    bunkerPointer = bunker.bp
+    identify()
     connect(bunker)
   }
 
@@ -303,72 +321,62 @@
   }, 500)
 
   function handleAbortConnection() {
-    longConnecting = false
+    takingTooLong = false
     connecting = false
     cancelConnection = true
     // TODO: Effectively abort the connection
   }
 
   async function connect(bunker: BunkerSigner) {
-    let connectionTimeout: number
-
-    function allowCancel() {
-      longConnecting = true
-      opened = true
-      clearTimeout(connectionTimeout)
-    }
-
     connecting = true
-    connectionTimeout = setTimeout(allowCancel, 5000)
+
+    let connectionTimeout = setTimeout(() => {
+      takingTooLong = true
+      opened = true
+    }, 5000)
 
     await bunker.connect()
 
     clearTimeout(connectionTimeout)
-    bunkerPointer = bunker.bp
+    localStorage.setItem('wnj:bunkerPointer', JSON.stringify(bunkerPointer))
 
-    // set this so the floating thing will update
-    connected = {
-      pubkey: bunker.bp.pubkey,
-      npub: npubEncode(bunker.bp.pubkey),
+    connected = true
+    connecting = false
+    takingTooLong = false
+    close()
+    resolveBunker(bunker)
+  }
+
+  function identify() {
+    let pubkey = bunkerPointer.pubkey
+
+    identity = {
+      pubkey: pubkey,
+      npub: npubEncode(pubkey),
       event: null
     }
 
-    localStorage.setItem('wnj:bunkerPointer', JSON.stringify(bunkerPointer))
-
-    // load metadata
     metadataSub = pool.subscribeMany(
       [
         'wss://purplepag.es',
         'wss://relay.snort.social',
         'wss://relay.nos.social'
       ],
-      [{kinds: [0], authors: [bunker.bp.pubkey]}],
+      [{kinds: [0], authors: [pubkey]}],
       {
         onevent(evt) {
-          if ((connected!.event?.created_at || 0) >= evt.created_at) return
+          if ((identity!.event?.created_at || 0) >= evt.created_at) return
           try {
             let {name, picture} = JSON.parse(evt.content)
-            connected!.event = evt
-            connected!.name = name
-            connected!.picture = picture
+            identity!.event = evt
+            identity!.name = name
+            identity!.picture = picture
           } catch (err) {
             /***/
           }
         }
       }
     )
-    connecting = false
-    longConnecting = false
-    close()
-    resolveBunker(bunker)
-  }
-
-  function showError(err: string) {
-    errorMessage = err
-  }
-
-  function cleanError() {
-    errorMessage = ''
   }
 
   function handleMouseDown(ev: MouseEvent) {
@@ -439,7 +447,7 @@
 <!-- svelte-ignore a11y-no-static-element-interactions -->
 <div
   class="tw-text-white tw-font-sans draggable tw-animate-fadein"
-  class:tw-cursor-pointer={!connected && !opened}
+  class:tw-cursor-pointer={!identity && !opened}
   style="position: fixed; {opened && $mobileMode
     ? 'width: 100%;'
     : ''}; right: {opened && $mobileMode
@@ -461,21 +469,21 @@
           Connecting to bunker
           <Spinner />
         </div>
-      {:else if !connected}
+      {:else if !identity}
         Connect with Nostr
       {:else}
         <div class="tw-flex tw-items-center">
-          {#if connected.picture}
+          {#if identity.picture}
             <img
-              src={connected.picture}
+              src={identity.picture}
               alt=""
               class="tw-w-5 tw-h-5 tw-rounded-full tw-mr-2"
             />
           {:else}
             ☉
           {/if}
-          {connected.name ||
-            connected.npub.slice(0, 7) + '…' + connected.npub.slice(-4)}
+          {identity.name ||
+            identity.npub.slice(0, 7) + '…' + identity.npub.slice(-4)}
         </div>
       {/if}
     </div>
@@ -538,7 +546,7 @@
         </div>
 
         <!-- Login view ################### -->
-      {:else if !connected}
+      {:else if !identity}
         <div class="tw-text-lg tw-text-center">
           How do you want to connect to Nostr?
         </div>
@@ -570,7 +578,7 @@
               Connect »
             {/if}
           </button>
-          {#if connecting && longConnecting}
+          {#if connecting && takingTooLong}
             <div class="tw-mt-6 tw-text-center tw-text-sm tw-leading-3">
               Waiting too much?
               <button
@@ -591,35 +599,35 @@
         {/if}
 
         <!-- Connected view ################### -->
-      {:else if connected}
+      {:else if identity}
         <div class="tw-text-center">
           <div class="tw-text-sm tw-mb-4">You are connected to Nostr as</div>
           <a
             target="_blank"
-            href={'https://nosta.me/' + connected.npub}
+            href={'https://nosta.me/' + identity.npub}
             class="tw-text-white tw-no-underline tw-group"
           >
-            {#if connected.picture || connected.name}
+            {#if identity.picture || identity.name}
               <div
                 class="tw-flex tw-items-center tw-justify-center tw-gap-2 tw-mb-2"
               >
-                {#if connected.picture}
+                {#if identity.picture}
                   <img
-                    src={connected.picture}
+                    src={identity.picture}
                     alt=""
                     class="tw-w-10 tw-h-10 tw-rounded-full tw-border-solid tw-border-2 tw-border-transparent group-hover:tw-border-{accent}-100"
                   />
                 {/if}
-                {#if connected.name}
+                {#if identity.name}
                   <div
                     class="tw-text-3xl group-hover:tw-underline tw-decoration-2 tw-underline-offset-4"
                   >
-                    {connected.name}
+                    {identity.name}
                   </div>
                 {/if}
               </div>
             {/if}
-            <div class="tw-block tw-break-all">{connected.npub}</div>
+            <div class="tw-block tw-break-all">{identity.npub}</div>
           </a>
         </div>
         <button
