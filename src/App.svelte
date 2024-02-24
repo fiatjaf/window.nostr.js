@@ -525,7 +525,7 @@
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->
 <div
-  class="text-white font-sans draggable animate-fadein"
+  class="draggable animate-fadein font-sans text-white"
   class:cursor-pointer={!identity && !opened}
   style="position: fixed; {opened && $mobileMode
     ? 'width: 100%;'
@@ -540,7 +540,7 @@
   <!-- Close status ################### -->
   {#if !opened}
     <div
-      class="px-4 py-2 bg-{accent}-700 hover:bg-{accent}-800 rounded shadow-[0_0px_10px_0px_rgba(0,0,0,0.3)] transition-all duration-200 {movingStyle}"
+      class="rounded px-4 py-2 shadow-[0_0px_10px_0px_rgba(0,0,0,0.3)] transition-all duration-200 bg-{accent}-700 hover:bg-{accent}-800 {movingStyle}"
     >
       <!-- Connecting view ################### -->
       {#if connecting}
@@ -556,7 +556,7 @@
             <img
               src={identity.picture}
               alt=""
-              class="w-5 h-5 rounded-full mr-2"
+              class="mr-2 h-5 w-5 rounded-full"
             />
           {:else}
             ☉
@@ -570,27 +570,27 @@
     <!-- Open status ################### -->
   {:else}
     <div
-      class="sm:w-96 px-8 py-8 bg-gradient-to-b from-{accent}-900 to-{accent}-700 rounded-md shadow-[0_0px_30px_0px_rgba(0,0,0,0.6)] transition-all animate-show {movingStyle}"
+      class="animate-show rounded-md bg-gradient-to-b px-8 py-8 shadow-[0_0px_30px_0px_rgba(0,0,0,0.6)] transition-all sm:w-96 from-{accent}-900 to-{accent}-700 {movingStyle}"
     >
       <button
         on:click={showInfo ? handleCloseInfo : handleCloseModal}
-        class="absolute top-0 right-2 bg-transparent cursor-pointer text-{accent}-600 text-3xl"
+        class="absolute right-2 top-0 cursor-pointer bg-transparent text-3xl text-{accent}-600"
         >⤫</button
       >
 
       {#if !showInfo}
         <button
           on:click={handleShowInfo}
-          class="absolute bottom-1 right-3 bg-transparent cursor-pointer text-{accent}-600 text-xl"
+          class="absolute bottom-1 right-3 cursor-pointer bg-transparent text-xl text-{accent}-600"
           >?</button
         >
       {/if}
 
       <!-- Show info ################### -->
       {#if showInfo}
-        <div class="text-lg text-center">What is that?</div>
-        <div class="leading-5 text-base">
-          <p class="mt-4 mb">
+        <div class="text-center text-lg">What is that?</div>
+        <div class="text-base leading-5">
+          <p class="mb mt-4">
             This widget is created with <i>window.nostr.js</i>, a small script
             you can drop in any page that already uses NIP-07 and make it also
             work with NIP-46 automatically when the user doesn't have an
@@ -618,12 +618,12 @@
 
       <!-- Create account view ################### -->
       {#if creating}
-        <div class="text-lg text-center">Create a Nostr account</div>
-        <form class="mt-4 mb-1" on:submit={handleCreate}>
+        <div class="text-center text-lg">Create a Nostr account</div>
+        <form class="mb-1 mt-4" on:submit={handleCreate}>
           <div class="flex flex-row">
             <!-- svelte-ignore a11y-autofocus -->
             <input
-              class="box-border w-40 px-2 py-1 rounded text-lg outline-none text-neutral-800"
+              class="box-border w-40 rounded px-2 py-1 text-lg text-neutral-800 outline-none"
               placeholder="bob"
               bind:this={nameInput}
               bind:value={nameInputValue}
@@ -632,7 +632,7 @@
             />
             <div class="mx-2 text-2xl">@</div>
             <select
-              class="w-full box-border px-2 py-1 rounded text-lg outline-none text-neutral-800"
+              class="box-border w-full rounded px-2 py-1 text-lg text-neutral-800 outline-none"
               bind:value={chosenProvider}
             >
               {#each providers as prov}
@@ -644,12 +644,12 @@
               {/each}
             </select>
           </div>
-          <div class="text-sm text-center mt-4 leading-4">
+          <div class="mt-4 text-center text-sm leading-4">
             A window from the selected provider will pop up to finalize the
             creation; if it doesn't display check if the browser is blocking it
           </div>
           <button
-            class="block w-full mt-4 px-2 py-1 text-lg rounded border-0 bg-{accent}-900 hover:bg-{accent}-950 cursor-pointer text-white disabled:bg-neutral-400 disabled:text-neutral-200 disabled:cursor-default"
+            class="mt-4 block w-full cursor-pointer rounded border-0 px-2 py-1 text-lg text-white disabled:cursor-default disabled:bg-neutral-400 disabled:text-neutral-200 bg-{accent}-900 hover:bg-{accent}-950"
             disabled={!chosenProvider || !nameInputValue}
           >
             Create »
@@ -658,20 +658,20 @@
         <div class="mt-6 text-center text-sm leading-3">
           Do you already have a Nostr address?<br />
           <button
-            class="border-0 bg-transparent text-white cursor-pointer underline text-sm"
+            class="cursor-pointer border-0 bg-transparent text-sm text-white underline"
             on:click={handleOpenLogin}>Login now</button
           >
         </div>
 
         <!-- Login view ################### -->
       {:else if !identity && !showInfo}
-        <div class="text-lg text-center">
+        <div class="text-center text-lg">
           How do you want to connect to Nostr?
         </div>
-        <form class="flex flex-col mt-4 mb-1" on:submit={handleConnect}>
+        <form class="mb-1 mt-4 flex flex-col" on:submit={handleConnect}>
           <!-- svelte-ignore a11y-autofocus -->
           <input
-            class="box-border w-full px-2 py-1 rounded text-lg outline-none text-neutral-800"
+            class="box-border w-full rounded px-2 py-1 text-lg text-neutral-800 outline-none"
             placeholder="user@provider or bunker://..."
             bind:this={bunkerInput}
             bind:value={bunkerInputValue}
@@ -680,13 +680,13 @@
           />
           {#if errorMessage}
             <div
-              class="my-2 p-2 text-sm leading-4 text-red-400 bg-yellow-100 rounded text-center"
+              class="my-2 rounded bg-yellow-100 p-2 text-center text-sm leading-4 text-red-400"
             >
               {errorMessage}
             </div>
           {/if}
           <button
-            class="flex w-full mt-4 px-2 py-1 text-lg rounded border-0 bg-{accent}-900 hover:bg-{accent}-950 cursor-pointer text-white disabled:bg-neutral-400 disabled:text-neutral-200 disabled:cursor-default items-center justify-center"
+            class="mt-4 flex w-full cursor-pointer items-center justify-center rounded border-0 px-2 py-1 text-lg text-white disabled:cursor-default disabled:bg-neutral-400 disabled:text-neutral-200 bg-{accent}-900 hover:bg-{accent}-950"
             disabled={!bunkerInputValueIsGood || connecting}
           >
             {#if connecting}
@@ -700,7 +700,7 @@
             <div class="mt-6 text-center text-sm leading-3">
               Waiting too much?
               <button
-                class="border-0 bg-transparent text-white cursor-pointer underline text-sm"
+                class="cursor-pointer border-0 bg-transparent text-sm text-white underline"
                 on:click={handleAbortConnection}>Cancel the connection</button
               >
             </div>
@@ -710,7 +710,7 @@
           <div class="mt-6 text-center text-sm leading-3">
             Do you need a Nostr account?<br />
             <button
-              class="border-0 bg-transparent text-white cursor-pointer underline text-sm"
+              class="cursor-pointer border-0 bg-transparent text-sm text-white underline"
               on:click={handleOpenCreate}>Sign up now</button
             >
           </div>
@@ -719,24 +719,24 @@
         <!-- Connected view ################### -->
       {:else if identity}
         <div class="text-center">
-          <div class="text-sm mb-4">You are connected to Nostr as</div>
+          <div class="mb-4 text-sm">You are connected to Nostr as</div>
           <a
             target="_blank"
             href={'https://nosta.me/' + identity.npub}
-            class="text-white no-underline group"
+            class="group text-white no-underline"
           >
             {#if identity.picture || identity.name}
-              <div class="flex items-center justify-center gap-2 mb-2">
+              <div class="mb-2 flex items-center justify-center gap-2">
                 {#if identity.picture}
                   <img
                     src={identity.picture}
                     alt=""
-                    class="w-10 h-10 rounded-full border-solid border-2 border-transparent group-hover:border-{accent}-100"
+                    class="h-10 w-10 rounded-full border-2 border-solid border-transparent group-hover:border-{accent}-100"
                   />
                 {/if}
                 {#if identity.name}
                   <div
-                    class="text-3xl group-hover:underline decoration-2 underline-offset-4"
+                    class="text-3xl decoration-2 underline-offset-4 group-hover:underline"
                   >
                     {identity.name}
                   </div>
@@ -747,10 +747,10 @@
           </a>
         </div>
         <button
-          class="block w-full my-2 mt-6 px-2 py-1 text-lg rounded border-0 bg-{accent}-900 hover:bg-{accent}-950 cursor-pointer text-white"
+          class="my-2 mt-6 block w-full cursor-pointer rounded border-0 px-2 py-1 text-lg text-white bg-{accent}-900 hover:bg-{accent}-950"
           on:click={handleDisconnect}>Disconnect</button
         >
-        <div class="block break-all mt-6 text-center text-sm">
+        <div class="mt-6 block break-all text-center text-sm">
           This webpage is using the public key:<br />
           {getPublicKey(clientSecret)}
         </div>
