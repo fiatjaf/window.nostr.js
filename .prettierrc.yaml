@@ -8,8 +8,8 @@ trailingComma: none
 useTabs: false
 bracketSpacing: false
 plugins:
-  - prettier-plugin-tailwindcss
   - prettier-plugin-svelte
+  - prettier-plugin-tailwindcss
 overrides:
   - files: '*.svelte'
     options:
