@@ -88,10 +88,10 @@
   $: opened = state === 'justopened' || state === 'opened'
 
   $: movingStyle = hasMoved
-    ? 'tw-cursor-grabbing tw-outline-dashed tw-outline-' +
+    ? 'cursor-grabbing outline-dashed outline-' +
       accent +
-      '-500 tw-outline-1 tw-outline-offset-4'
-    : 'tw-outline-none'
+      '-500 outline-1 outline-offset-4'
+    : 'outline-none'
 
   $: bunkerInputValueIsGood =
     bunkerInputValue &&
@@ -450,8 +450,8 @@
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->
 <div
-  class="tw-text-white tw-font-sans draggable tw-animate-fadein"
-  class:tw-cursor-pointer={!identity && !opened}
+  class="text-white font-sans draggable animate-fadein"
+  class:cursor-pointer={!identity && !opened}
   style="position: fixed; {opened && $mobileMode
     ? 'width: 100%;'
     : ''}; right: {opened && $mobileMode
@@ -465,23 +465,23 @@
   <!-- Close status ################### -->
   {#if !opened}
     <div
-      class="tw-px-4 tw-py-2 tw-bg-{accent}-700 hover:tw-bg-{accent}-800 tw-rounded tw-shadow-[0_0px_10px_0px_rgba(0,0,0,0.3)] tw-transition-all tw-duration-200 {movingStyle}"
+      class="px-4 py-2 bg-{accent}-700 hover:bg-{accent}-800 rounded shadow-[0_0px_10px_0px_rgba(0,0,0,0.3)] transition-all duration-200 {movingStyle}"
     >
       <!-- Connecting view ################### -->
       {#if connecting}
-        <div class="tw-flex tw-items-center">
+        <div class="flex items-center">
           Connecting to bunker
           <Spinner />
         </div>
       {:else if !identity}
         Connect with Nostr
       {:else}
-        <div class="tw-flex tw-items-center">
+        <div class="flex items-center">
           {#if identity.picture}
             <img
               src={identity.picture}
               alt=""
-              class="tw-w-5 tw-h-5 tw-rounded-full tw-mr-2"
+              class="w-5 h-5 rounded-full mr-2"
             />
           {:else}
             ☉
@@ -495,69 +495,69 @@
     <!-- Open status ################### -->
   {:else}
     <div
-      class="sm:tw-w-96 tw-px-8 tw-py-8 tw-bg-gradient-to-b tw-from-{accent}-900 tw-to-{accent}-700 tw-rounded-md tw-shadow-[0_0px_30px_0px_rgba(0,0,0,0.6)] tw-transition-all tw-animate-show {movingStyle}"
+      class="sm:w-96 px-8 py-8 bg-gradient-to-b from-{accent}-900 to-{accent}-700 rounded-md shadow-[0_0px_30px_0px_rgba(0,0,0,0.6)] transition-all animate-show {movingStyle}"
     >
       <button
         on:click={handleCloseModal}
-        class="tw-absolute tw-top-0 tw-right-2 tw-bg-transparent tw-cursor-pointer tw-text-{accent}-600 tw-text-3xl"
+        class="absolute top-0 right-2 bg-transparent cursor-pointer text-{accent}-600 text-3xl"
         >⤫</button
       >
       <!-- Create account view ################### -->
       {#if creating}
-        <div class="tw-text-lg tw-text-center">Create a Nostr account</div>
-        <form class="tw-mt-4 tw-mb-1" on:submit={handleCreate}>
-          <div class="tw-flex items-center">
+        <div class="text-lg text-center">Create a Nostr account</div>
+        <form class="mt-4 mb-1" on:submit={handleCreate}>
+          <div class="flex flex-row">
             <!-- svelte-ignore a11y-autofocus -->
             <input
-              class="tw-box-border tw-w-40 tw-px-2 tw-py-1 tw-rounded tw-text-lg tw-outline-none tw-text-neutral-800"
+              class="box-border w-40 px-2 py-1 rounded text-lg outline-none text-neutral-800"
               placeholder="bob"
               bind:this={nameInput}
               bind:value={nameInputValue}
               on:input={checkNameInput}
               autofocus
             />
-            <div class="tw-mx-2 tw-text-2xl">@</div>
+            <div class="mx-2 text-2xl">@</div>
             <select
-              class="tw-w-full tw-box-border tw-px-2 tw-py-1 tw-rounded tw-text-lg tw-outline-none tw-text-neutral-800"
+              class="w-full box-border px-2 py-1 rounded text-lg outline-none text-neutral-800"
               bind:value={chosenProvider}
             >
               {#each providers as prov}
                 <option
                   label={prov.domain}
                   value={prov}
-                  class="tw-px-2 tw-py-1 tw-text-lg"
+                  class="px-2 py-1 text-lg"
                 />
               {/each}
             </select>
           </div>
-          <div class="tw-text-sm tw-text-center tw-mt-4 tw-leading-4">
+          <div class="text-sm text-center mt-4 leading-4">
             A window from the selected provider will pop up to finalize the
             creation; if it doesn't display check if the browser is blocking it
           </div>
           <button
-            class="tw-block tw-w-full tw-mt-4 tw-px-2 tw-py-1 tw-text-lg tw-rounded tw-border-0 tw-bg-{accent}-900 hover:tw-bg-{accent}-950 tw-cursor-pointer tw-text-white disabled:tw-bg-neutral-400 disabled:tw-text-neutral-200 disabled:tw-cursor-default"
+            class="block w-full mt-4 px-2 py-1 text-lg rounded border-0 bg-{accent}-900 hover:bg-{accent}-950 cursor-pointer text-white disabled:bg-neutral-400 disabled:text-neutral-200 disabled:cursor-default"
             disabled={!chosenProvider || !nameInputValue}
           >
             Create »
           </button>
         </form>
-        <div class="tw-mt-6 tw-text-center tw-text-sm tw-leading-3">
+        <div class="mt-6 text-center text-sm leading-3">
           Do you already have a Nostr address?<br />
           <button
-            class="tw-border-0 tw-bg-transparent tw-text-white tw-cursor-pointer tw-underline tw-text-sm"
+            class="border-0 bg-transparent text-white cursor-pointer underline text-sm"
             on:click={handleOpenLogin}>Login now</button
           >
         </div>
 
         <!-- Login view ################### -->
       {:else if !identity}
-        <div class="tw-text-lg tw-text-center">
+        <div class="text-lg text-center">
           How do you want to connect to Nostr?
         </div>
-        <form class="flex tw-mt-4 tw-mb-1" on:submit={handleConnect}>
+        <form class="flex flex-col mt-4 mb-1" on:submit={handleConnect}>
           <!-- svelte-ignore a11y-autofocus -->
           <input
-            class="tw-box-border tw-w-full tw-px-2 tw-py-1 tw-rounded tw-text-lg tw-outline-none tw-text-neutral-800"
+            class="box-border w-full px-2 py-1 rounded text-lg outline-none text-neutral-800"
             placeholder="user@provider or bunker://..."
             bind:this={bunkerInput}
             bind:value={bunkerInputValue}
@@ -566,13 +566,13 @@
           />
           {#if errorMessage}
             <div
-              class="tw-my-2 tw-p-2 tw-text-sm tw-leading-4 tw-text-red-400 tw-bg-yellow-100 tw-rounded tw-text-center"
+              class="my-2 p-2 text-sm leading-4 text-red-400 bg-yellow-100 rounded text-center"
             >
               {errorMessage}
             </div>
           {/if}
           <button
-            class="tw-flex tw-w-full tw-mt-4 tw-px-2 tw-py-1 tw-text-lg tw-rounded tw-border-0 tw-bg-{accent}-900 hover:tw-bg-{accent}-950 tw-cursor-pointer tw-text-white disabled:tw-bg-neutral-400 disabled:tw-text-neutral-200 disabled:tw-cursor-default tw-items-center tw-justify-center"
+            class="flex w-full mt-4 px-2 py-1 text-lg rounded border-0 bg-{accent}-900 hover:bg-{accent}-950 cursor-pointer text-white disabled:bg-neutral-400 disabled:text-neutral-200 disabled:cursor-default items-center justify-center"
             disabled={!bunkerInputValueIsGood || connecting}
           >
             {#if connecting}
@@ -583,20 +583,20 @@
             {/if}
           </button>
           {#if connecting && takingTooLong}
-            <div class="tw-mt-6 tw-text-center tw-text-sm tw-leading-3">
+            <div class="mt-6 text-center text-sm leading-3">
               Waiting too much?
               <button
-                class="tw-border-0 tw-bg-transparent tw-text-white tw-cursor-pointer tw-underline tw-text-sm"
+                class="border-0 bg-transparent text-white cursor-pointer underline text-sm"
                 on:click={handleAbortConnection}>Cancel the connection</button
               >
             </div>
           {/if}
         </form>
         {#if !connecting}
-          <div class="tw-mt-6 tw-text-center tw-text-sm tw-leading-3">
+          <div class="mt-6 text-center text-sm leading-3">
             Do you need a Nostr account?<br />
             <button
-              class="tw-border-0 tw-bg-transparent tw-text-white tw-cursor-pointer tw-underline tw-text-sm"
+              class="border-0 bg-transparent text-white cursor-pointer underline text-sm"
               on:click={handleOpenCreate}>Sign up now</button
             >
           </div>
@@ -604,41 +604,41 @@
 
         <!-- Connected view ################### -->
       {:else if identity}
-        <div class="tw-text-center">
-          <div class="tw-text-sm tw-mb-4">You are connected to Nostr as</div>
+        <div class="text-center">
+          <div class="text-sm mb-4">You are connected to Nostr as</div>
           <a
             target="_blank"
             href={'https://nosta.me/' + identity.npub}
-            class="tw-text-white tw-no-underline tw-group"
+            class="text-white no-underline group"
           >
             {#if identity.picture || identity.name}
               <div
-                class="tw-flex tw-items-center tw-justify-center tw-gap-2 tw-mb-2"
+                class="flex items-center justify-center gap-2 mb-2"
               >
                 {#if identity.picture}
                   <img
                     src={identity.picture}
                     alt=""
-                    class="tw-w-10 tw-h-10 tw-rounded-full tw-border-solid tw-border-2 tw-border-transparent group-hover:tw-border-{accent}-100"
+                    class="w-10 h-10 rounded-full border-solid border-2 border-transparent group-hover:border-{accent}-100"
                   />
                 {/if}
                 {#if identity.name}
                   <div
-                    class="tw-text-3xl group-hover:tw-underline tw-decoration-2 tw-underline-offset-4"
+                    class="text-3xl group-hover:underline decoration-2 underline-offset-4"
                   >
                     {identity.name}
                   </div>
                 {/if}
               </div>
             {/if}
-            <div class="tw-block tw-break-all">{identity.npub}</div>
+            <div class="block break-all">{identity.npub}</div>
           </a>
         </div>
         <button
-          class="tw-block tw-w-full tw-my-2 tw-mt-6 tw-px-2 tw-py-1 tw-text-lg tw-rounded tw-border-0 tw-bg-{accent}-900 hover:tw-bg-{accent}-950 tw-cursor-pointer tw-text-white"
+          class="block w-full my-2 mt-6 px-2 py-1 text-lg rounded border-0 bg-{accent}-900 hover:bg-{accent}-950 cursor-pointer text-white"
           on:click={handleDisconnect}>Disconnect</button
         >
-        <div class="tw-block tw-break-all tw-mt-6 tw-text-center tw-text-sm">
+        <div class="block break-all mt-6 text-center text-sm">
           This webpage is using the public key:<br />
           {getPublicKey(clientSecret)}
         </div>

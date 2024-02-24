@@ -21,14 +21,14 @@ export default {
     }
   },
   plugins: [],
-  prefix: 'tw-',
+  prefix: '',
   safelist: [
-    'tw-bg-cyan-700', 'hover:tw-bg-cyan-700', 'tw-bg-cyan-800', 'hover:tw-bg-cyan-800', 'tw-bg-cyan-900', 'hover:tw-bg-cyan-900', 'tw-bg-cyan-950', 'hover:tw-bg-cyan-950', 'tw-text-cyan-600', 'tw-outline-cyan-500', 'tw-from-cyan-900', 'tw-to-cyan-700',
-    'tw-bg-green-700', 'hover:tw-bg-green-700', 'tw-bg-green-800', 'hover:tw-bg-green-800', 'tw-bg-green-900', 'hover:tw-bg-green-900', 'tw-bg-green-950', 'hover:tw-bg-green-950', 'tw-text-green-600', 'tw-outline-green-500', 'tw-from-green-900', 'tw-to-green-700',
-    'tw-bg-purple-700', 'hover:tw-bg-purple-700', 'tw-bg-purple-800', 'hover:tw-bg-purple-800', 'tw-bg-purple-900', 'hover:tw-bg-purple-900', 'tw-bg-purple-950', 'hover:tw-bg-purple-950', 'tw-text-purple-600', 'tw-outline-purple-500', 'tw-from-purple-900', 'tw-to-purple-700',
-    'tw-bg-red-700', 'hover:tw-bg-red-700', 'tw-bg-red-800', 'hover:tw-bg-red-800', 'tw-bg-red-900', 'hover:tw-bg-red-900', 'tw-bg-red-950', 'hover:tw-bg-red-950', 'tw-text-red-600', 'tw-outline-red-500', 'tw-from-red-900', 'tw-to-red-700',
-    'tw-bg-orange-700', 'hover:tw-bg-orange-700', 'tw-bg-orange-800', 'hover:tw-bg-orange-800', 'tw-bg-orange-900', 'hover:tw-bg-orange-900', 'tw-bg-orange-950', 'hover:tw-bg-orange-950', 'tw-text-orange-600', 'tw-outline-orange-500', 'tw-from-orange-900', 'tw-to-orange-700',
-    'tw-bg-neutral-700', 'hover:tw-bg-neutral-700', 'tw-bg-neutral-800', 'hover:tw-bg-neutral-800', 'tw-bg-neutral-900', 'hover:tw-bg-neutral-900', 'tw-bg-neutral-950', 'hover:tw-bg-neutral-950', 'tw-text-neutral-600', 'tw-outline-neutral-500', 'tw-from-neutral-900', 'tw-to-neutral-700',
-    'tw-bg-stone-700', 'hover:tw-bg-stone-700', 'tw-bg-stone-800', 'hover:tw-bg-stone-800', 'tw-bg-stone-900', 'hover:tw-bg-stone-900', 'tw-bg-stone-950', 'hover:tw-bg-stone-950', 'tw-text-stone-600', 'tw-outline-stone-500', 'tw-from-stone-900', 'tw-to-stone-700',
+    'bg-cyan-700', 'hover:bg-cyan-700', 'bg-cyan-800', 'hover:bg-cyan-800', 'bg-cyan-900', 'hover:bg-cyan-900', 'bg-cyan-950', 'hover:bg-cyan-950', 'text-cyan-600', 'outline-cyan-500', 'from-cyan-900', 'to-cyan-700',
+    'bg-green-700', 'hover:bg-green-700', 'bg-green-800', 'hover:bg-green-800', 'bg-green-900', 'hover:bg-green-900', 'bg-green-950', 'hover:bg-green-950', 'text-green-600', 'outline-green-500', 'from-green-900', 'to-green-700',
+    'bg-purple-700', 'hover:bg-purple-700', 'bg-purple-800', 'hover:bg-purple-800', 'bg-purple-900', 'hover:bg-purple-900', 'bg-purple-950', 'hover:bg-purple-950', 'text-purple-600', 'outline-purple-500', 'from-purple-900', 'to-purple-700',
+    'bg-red-700', 'hover:bg-red-700', 'bg-red-800', 'hover:bg-red-800', 'bg-red-900', 'hover:bg-red-900', 'bg-red-950', 'hover:bg-red-950', 'text-red-600', 'outline-red-500', 'from-red-900', 'to-red-700',
+    'bg-orange-700', 'hover:bg-orange-700', 'bg-orange-800', 'hover:bg-orange-800', 'bg-orange-900', 'hover:bg-orange-900', 'bg-orange-950', 'hover:bg-orange-950', 'text-orange-600', 'outline-orange-500', 'from-orange-900', 'to-orange-700',
+    'bg-neutral-700', 'hover:bg-neutral-700', 'bg-neutral-800', 'hover:bg-neutral-800', 'bg-neutral-900', 'hover:bg-neutral-900', 'bg-neutral-950', 'hover:bg-neutral-950', 'text-neutral-600', 'outline-neutral-500', 'from-neutral-900', 'to-neutral-700',
+    'bg-stone-700', 'hover:bg-stone-700', 'bg-stone-800', 'hover:bg-stone-800', 'bg-stone-900', 'hover:bg-stone-900', 'bg-stone-950', 'hover:bg-stone-950', 'text-stone-600', 'outline-stone-500', 'from-stone-900', 'to-stone-700',
   ]
 }
