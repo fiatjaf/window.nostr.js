@@ -495,11 +495,11 @@
     <!-- Open status ################### -->
   {:else}
     <div
-      class="sm:tw-w-80 tw-px-6 tw-py-8 tw-bg-{accent}-700 tw-rounded-md tw-shadow-[0_0px_30px_0px_rgba(0,0,0,0.6)] tw-transition-all tw-animate-show {movingStyle}"
+      class="sm:tw-w-96 tw-px-6 tw-py-8 tw-bg-{accent}-700 tw-rounded-md tw-shadow-[0_0px_30px_0px_rgba(0,0,0,0.6)] tw-transition-all tw-animate-show {movingStyle}"
     >
       <button
         on:click={handleCloseModal}
-        class="tw-absolute tw-top-0 tw-right-0.5 tw-bg-transparent tw-border-none tw-cursor-pointer tw-text-{accent}-950 tw-text-3xl"
+        class="tw-absolute tw-top-0 tw-right-2 tw-bg-transparent tw-cursor-pointer tw-text-{accent}-950 tw-text-3xl"
         >⤫</button
       >
       <!-- Create account view ################### -->
@@ -509,7 +509,7 @@
           <div class="tw-flex items-center">
             <!-- svelte-ignore a11y-autofocus -->
             <input
-              class="tw-box-border tw-w-40 tw-px-2 tw-py-1 tw-rounded tw-text-lg tw-border-none tw-outline-none"
+              class="tw-box-border tw-w-40 tw-px-2 tw-py-1 tw-rounded tw-text-lg tw-outline-none tw-text-neutral-800"
               placeholder="bob"
               bind:this={nameInput}
               bind:value={nameInputValue}
@@ -518,7 +518,7 @@
             />
             <div class="tw-mx-2 tw-text-2xl">@</div>
             <select
-              class="tw-w-full tw-box-border tw-px-2 tw-py-1 tw-rounded tw-text-lg tw-border-none tw-outline-none"
+              class="tw-w-full tw-box-border tw-px-2 tw-py-1 tw-rounded tw-text-lg tw-outline-none tw-text-neutral-800"
               bind:value={chosenProvider}
             >
               {#each providers as prov}
@@ -557,7 +557,7 @@
         <form class="flex tw-mt-4 tw-mb-1" on:submit={handleConnect}>
           <!-- svelte-ignore a11y-autofocus -->
           <input
-            class="tw-box-border tw-w-full tw-px-2 tw-py-1 tw-rounded tw-text-lg tw-border-none tw-outline-none"
+            class="tw-box-border tw-w-full tw-px-2 tw-py-1 tw-rounded tw-text-lg tw-outline-none tw-text-neutral-800"
             placeholder="user@provider or bunker://..."
             bind:this={bunkerInput}
             bind:value={bunkerInputValue}
@@ -566,7 +566,7 @@
           />
           {#if errorMessage}
             <div
-              class="tw-my-2 tw-p-2 tw-text-sm tw-leading-4 tw-text-red-400 tw-bg-yellow-100 tw-rounded"
+              class="tw-my-2 tw-p-2 tw-text-sm tw-leading-4 tw-text-red-400 tw-bg-yellow-100 tw-rounded tw-text-center"
             >
               {errorMessage}
             </div>
