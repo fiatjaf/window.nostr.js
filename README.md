@@ -8,6 +8,21 @@ It adds a small floating button on the side of the window that users can use to 
 
 Include `<script src="https://unpkg.com/window.nostr.js/dist/window.nostr.js"></script>` in your HTML and proceed to use [`window.nostr`](https://nips.nostr.com/7) normally.
 
+## Customization
+The script supports some optional configurations to personalize the design:
+
+```
+<script>
+  window.wnjParams = {
+    position: 'bottom',
+    // The only accepted value is 'bottom', default is top
+    accent: 'green',
+    // Supported values: cyan (default), green, purple, red, orange, neutral, stone
+  }
+</script>
+<script src="https://unpkg.com/window.nostr.js/dist/window.nostr.js"></script>
+```
+
 ## Bookmarklet
 
 If a website has opted to not include this, but you like it, you can still use it on the website. Just add this to your browser bookmarks and click on it to load the widget on any website:
