@@ -495,11 +495,11 @@
     <!-- Open status ################### -->
   {:else}
     <div
-      class="sm:tw-w-96 tw-px-6 tw-py-8 tw-bg-{accent}-700 tw-rounded-md tw-shadow-[0_0px_30px_0px_rgba(0,0,0,0.6)] tw-transition-all tw-animate-show {movingStyle}"
+      class="sm:tw-w-96 tw-px-6 tw-py-8 tw-bg-gradient-to-b tw-from-{accent}-900 tw-to-{accent}-700 tw-rounded-md tw-shadow-[0_0px_30px_0px_rgba(0,0,0,0.6)] tw-transition-all tw-animate-show {movingStyle}"
     >
       <button
         on:click={handleCloseModal}
-        class="tw-absolute tw-top-0 tw-right-2 tw-bg-transparent tw-cursor-pointer tw-text-{accent}-950 tw-text-3xl"
+        class="tw-absolute tw-top-0 tw-right-2 tw-bg-transparent tw-cursor-pointer tw-text-{accent}-600 tw-text-3xl"
         >⤫</button
       >
       <!-- Create account view ################### -->
