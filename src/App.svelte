@@ -535,7 +535,7 @@
             creation; if it doesn't display check if the browser is blocking it
           </div>
           <button
-            class="tw-block tw-w-full tw-mt-4 tw-px-2 tw-py-1 tw-text-lg tw-rounded tw-border-0 tw-bg-{accent}-900 hover:tw-bg-{accent}-950 tw-hover:bg-indigo-900 tw-cursor-pointer tw-text-white disabled:tw-bg-neutral-400 disabled:tw-text-neutral-200 disabled:tw-cursor-default"
+            class="tw-block tw-w-full tw-mt-4 tw-px-2 tw-py-1 tw-text-lg tw-rounded tw-border-0 tw-bg-{accent}-900 hover:tw-bg-{accent}-950 tw-cursor-pointer tw-text-white disabled:tw-bg-neutral-400 disabled:tw-text-neutral-200 disabled:tw-cursor-default"
             disabled={!chosenProvider || !nameInputValue}
           >
             Create »
@@ -572,7 +572,7 @@
             </div>
           {/if}
           <button
-            class="tw-flex tw-w-full tw-mt-4 tw-px-2 tw-py-1 tw-text-lg tw-rounded tw-border-0 tw-bg-{accent}-900 hover:tw-bg-{accent}-950 tw-hover:bg-indigo-900 tw-cursor-pointer tw-text-white disabled:tw-bg-neutral-400 disabled:tw-text-neutral-200 disabled:tw-cursor-default tw-items-center tw-justify-center"
+            class="tw-flex tw-w-full tw-mt-4 tw-px-2 tw-py-1 tw-text-lg tw-rounded tw-border-0 tw-bg-{accent}-900 hover:tw-bg-{accent}-950 tw-cursor-pointer tw-text-white disabled:tw-bg-neutral-400 disabled:tw-text-neutral-200 disabled:tw-cursor-default tw-items-center tw-justify-center"
             disabled={!bunkerInputValueIsGood || connecting}
           >
             {#if connecting}
@@ -635,7 +635,7 @@
           </a>
         </div>
         <button
-          class="tw-block tw-w-full tw-my-2 tw-mt-6 tw-px-2 tw-py-1 tw-text-lg tw-rounded tw-border-0 tw-bg-{accent}-900 hover:tw-bg-{accent}-950 tw-hover:bg-indigo-900 tw-cursor-pointer tw-text-white"
+          class="tw-block tw-w-full tw-my-2 tw-mt-6 tw-px-2 tw-py-1 tw-text-lg tw-rounded tw-border-0 tw-bg-{accent}-900 hover:tw-bg-{accent}-950 tw-cursor-pointer tw-text-white"
           on:click={handleDisconnect}>Disconnect</button
         >
         <div class="tw-block tw-break-all tw-mt-6 tw-text-center tw-text-sm">
