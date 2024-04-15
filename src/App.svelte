@@ -617,7 +617,7 @@
       {/if}
 
       <!-- Create account view ################### -->
-      {#if creating}
+      {#if creating && !showInfo}
         <div class="text-center text-lg">Create a Nostr account</div>
         <form class="mb-1 mt-4" on:submit={handleCreate}>
           <div class="flex flex-row">
