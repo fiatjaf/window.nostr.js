@@ -629,6 +629,7 @@
               bind:value={nameInputValue}
               on:input={checkNameInput}
               autofocus
+              autocapitalize="none"
             />
             <div class="mx-2 text-2xl">@</div>
             <select
@@ -677,6 +678,7 @@
             bind:value={bunkerInputValue}
             autofocus
             disabled={connecting}
+            autocapitalize="none"
           />
           {#if errorMessage}
             <div
