@@ -257,6 +257,7 @@
   function handleCloseModal(ev: MouseEvent) {
     close()
     creating = false
+    showAuth = null
     ev.stopPropagation()
   }
 
@@ -543,7 +544,7 @@
         >⤫</button
       >
 
-      {#if !showInfo}
+      {#if !showInfo && !showAuth}
         <button
           on:click={handleShowInfo}
           class="absolute bottom-1 right-3 cursor-pointer bg-transparent text-xl text-{accent}-600"
@@ -553,11 +554,15 @@
 
       {#if showAuth}
         <div class="m-auto w-full">
-          <button on:click={() => openAuthURLPopup(showAuth)}>
-            continue to
-            <div class="bg-white px-2 py-1 text-lg text-black">
-              {new URL(showAuth).host}
-            </div>
+          <div class="text-center text-lg">Create a Nostr account</div>
+          <div class="mt-4 text-center text-sm leading-4">
+            Now you a new window will bring you to <strong>{new URL(showAuth).host}</strong> where the account creation will take place. If nothing happens check that if your browser is blocking popups, pleaase.<br/>
+            After that you will be returned to this page.
+          </div>
+          <button
+            class="mt-4 block w-full cursor-pointer rounded border-0 px-2 py-1 text-lg text-white disabled:cursor-default disabled:bg-neutral-400 disabled:text-neutral-200 bg-{accent}-900 hover:bg-{accent}-950"
+            on:click={() => openAuthURLPopup(showAuth)}>
+            Start account creation »
           </button>
         </div>
 
@@ -619,15 +624,11 @@
               {/each}
             </select>
           </div>
-          <div class="mt-4 text-center text-sm leading-4">
-            A window from the selected provider will pop up to finalize the
-            creation; if it doesn't display check if the browser is blocking it
-          </div>
           <button
             class="mt-4 block w-full cursor-pointer rounded border-0 px-2 py-1 text-lg text-white disabled:cursor-default disabled:bg-neutral-400 disabled:text-neutral-200 bg-{accent}-900 hover:bg-{accent}-950"
             disabled={!chosenProvider || !nameInputValue || awaitingCreation}
           >
-            Create »
+            Continue »
           </button>
         </form>
         <div class="mt-6 text-center text-sm leading-3">
