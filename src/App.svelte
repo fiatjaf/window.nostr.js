@@ -69,8 +69,10 @@
   let bunker: Promise<BunkerSigner>
   let connecting: boolean
   let connected: boolean
+  let showAuth: string | null = null
   let takingTooLong = false
   let creating: boolean
+  let awaitingCreation: boolean
   let errorMessage: string
   let showInfo = false
   let identity: null | {
@@ -114,26 +116,15 @@
   const bunkerSignerParams: BunkerSignerParams = {
     pool,
     onauth(url: string) {
-      const popup = null /* window.open(
-        url,
-        'window.nostr',
-        `width=600,height=800,popup=yes`
-      )*/
+      const popup = null // openAuthURLPopup(url)
       if (!popup) {
-        const callbackUrl = new URL(window.location.href)
-        const state = Math.random().toString().substring(2)
-        localStorage.setItem(localStorageKeys.CALLBACK_TOKEN, state)
-        callbackUrl.searchParams.set(
-          'wnjCallbackData',
-          `${state}|${chosenProvider?.bunkerPointer.relays.join(',')}|${chosenProvider?.bunkerPointer.secret}`
-        )
-
-        const redirectUrl = new URL(url)
-        redirectUrl.searchParams.set('callbackUrl', callbackUrl.toString())
-
-        window.location.href = redirectUrl.toString()
+        showAuth = url
       }
     }
+  }
+
+  function openAuthURLPopup(url: string | null): Window | null {
+    return window.open(url!, 'window.nostr', `width=600,height=800,popup=yes`)
   }
 
   const delayedUpdateState = debounce(() => {
@@ -213,37 +204,6 @@
   }
 
   onMount(() => {
-    // first check if we just got redirected from an auth_url
-    const state = localStorage.getItem(localStorageKeys.CALLBACK_TOKEN)
-    const qs = new URLSearchParams(window.location.search)
-    const callbackData = qs.get('wnjCallbackData') || ''
-    const [callbackState, relaysBlob, secret] = callbackData.split(';')
-    if (typeof state === 'string' && state !== '' && callbackState === state) {
-      // we did just got redirected
-      // the querystring item "wnjCallbackData" should have the data we need after the "state"
-      const relays = relaysBlob.split(',').filter(ru => ru.trim().length > 0)
-
-      // and the "pubkey" querystring item should have been added by the provider
-      const pubkey = qs.get('pubkey')
-      if (pubkey && relays.length > 0) {
-        // now we have everything we need to establish a bunker connection
-        bunkerPointer = {
-          relays,
-          pubkey,
-          secret: secret.length > 0 ? secret : null
-        }
-        identify(open)
-
-        // and store it
-        localStorage.setItem(
-          localStorageKeys.BUNKER_POINTER,
-          JSON.stringify(bunkerPointer)
-        )
-      }
-    }
-    localStorage.removeItem(localStorageKeys.CALLBACK_TOKEN)
-
-    // proceed with the normal flow and load bunker stuff from localStorage
     if (!bunkerPointer) {
       let data = localStorage.getItem(localStorageKeys.BUNKER_POINTER)
       if (data) {
@@ -367,12 +327,14 @@
     ev.preventDefault()
     if (!chosenProvider) return
 
+    awaitingCreation = true
     let bunker = await createAccount(
       chosenProvider,
       bunkerSignerParams,
       nameInput.value,
       chosenProvider.domain
     )
+    awaitingCreation = false
 
     open()
     creating = false
@@ -589,8 +551,18 @@
         >
       {/if}
 
-      <!-- Show info ################### -->
-      {#if showInfo}
+      {#if showAuth}
+        <div class="m-auto w-full">
+          <button on:click={() => openAuthURLPopup(showAuth)}>
+            continue to
+            <div class="bg-white px-2 py-1 text-lg text-black">
+              {new URL(showAuth).host}
+            </div>
+          </button>
+        </div>
+
+        <!-- Show info ################### -->
+      {:else if showInfo}
         <div class="text-center text-lg">What is that?</div>
         <div class="text-base leading-5">
           <p class="mb mt-4">
@@ -617,10 +589,9 @@
             >.
           </p>
         </div>
-      {/if}
 
-      <!-- Create account view ################### -->
-      {#if creating && !showInfo}
+        <!-- Create account view ################### -->
+      {:else if creating}
         <div class="text-center text-lg">Create a Nostr account</div>
         <form class="mb-1 mt-4" on:submit={handleCreate}>
           <div class="flex flex-row">
@@ -654,7 +625,7 @@
           </div>
           <button
             class="mt-4 block w-full cursor-pointer rounded border-0 px-2 py-1 text-lg text-white disabled:cursor-default disabled:bg-neutral-400 disabled:text-neutral-200 bg-{accent}-900 hover:bg-{accent}-950"
-            disabled={!chosenProvider || !nameInputValue}
+            disabled={!chosenProvider || !nameInputValue || awaitingCreation}
           >
             Create »
           </button>
@@ -668,7 +639,7 @@
         </div>
 
         <!-- Login view ################### -->
-      {:else if !identity && !showInfo}
+      {:else if !identity}
         <div class="text-center text-lg">
           How do you want to connect to Nostr?
         </div>
@@ -722,7 +693,7 @@
         {/if}
 
         <!-- Connected view ################### -->
-      {:else if identity}
+      {:else}
         <div class="text-center">
           <div class="mb-4 text-sm">You are connected to Nostr as</div>
           <a
