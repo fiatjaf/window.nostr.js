@@ -25,14 +25,23 @@
   import Spinner from './Spinner.svelte'
 
   const mobileMode = mediaQueryStore('only screen and (max-width: 640px)')
+  const localStorageKeys = {
+    ORIGIN: 'wnj:origin',
+    CLIENT_SECRET: 'wnj:clientSecret',
+    Y_POS: 'wnj:ypos',
+    CALLBACK_TOKEN: 'wnj:callbackToken',
+    BUNKER_POINTER: 'wnj:bunkerPointer'
+  }
 
   let myself: HTMLDivElement
   export let accent: string
   export let position: 'top' | 'bottom' = 'top'
   $: origin = $mobileMode
     ? 'bottom'
-    : (localStorage.getItem('wnj:origin') as 'top' | 'bottom' | null) ||
-      position
+    : (localStorage.getItem(localStorageKeys.ORIGIN) as
+        | 'top'
+        | 'bottom'
+        | null) || position
 
   const win = window as any
   const pool = new SimplePool()
@@ -42,12 +51,15 @@
   let nameInputValue: string
   let chosenProvider: BunkerProfile | undefined
   let clientSecret: Uint8Array
-  const local = localStorage.getItem('wnj:clientSecret')
+  const local = localStorage.getItem(localStorageKeys.CLIENT_SECRET)
   if (local) {
     clientSecret = hexToBytes(local)
   } else {
     clientSecret = generateSecretKey()
-    localStorage.setItem('wnj:clientSecret', bytesToHex(clientSecret))
+    localStorage.setItem(
+      localStorageKeys.CLIENT_SECRET,
+      bytesToHex(clientSecret)
+    )
   }
 
   let state: 'opened' | 'closed' | 'justopened' | 'justclosed' = 'closed'
@@ -79,7 +91,7 @@
   export let right = 20
   $: ypos = $mobileMode
     ? BASE_YPOS
-    : parseInt(localStorage.getItem('wnj:ypos') || '0') || BASE_YPOS
+    : parseInt(localStorage.getItem(localStorageKeys.Y_POS) || '0') || BASE_YPOS
   let dragStarted = false
   let hasMoved = false
   let insidePosition: number
@@ -102,7 +114,22 @@
   const bunkerSignerParams: BunkerSignerParams = {
     pool,
     onauth(url: string) {
-      window.open(url, 'window.nostr', `width=600,height=800,popup=yes`)
+      const popup = window.open(
+        url,
+        'window.nostr',
+        `width=600,height=800,popup=yes`
+      )
+      if (!popup) {
+        const callbackUrl = new URL(window.location.href)
+        const state = Math.random().toString().substring(2)
+        localStorage.setItem(localStorageKeys.CALLBACK_TOKEN, state)
+        callbackUrl.searchParams.set('wnjCallbackData', state)
+
+        const redirectUrl = new URL(url)
+        redirectUrl.searchParams.set('callbackUrl', callbackUrl.toString())
+
+        window.location.href = redirectUrl.toString()
+      }
     }
   }
 
@@ -183,13 +210,45 @@
   }
 
   onMount(() => {
-    let data = localStorage.getItem('wnj:bunkerPointer')
-    if (data) {
-      bunkerPointer = JSON.parse(data)
-      // we have a pointer, which means we can get the public key right away
-      // but we will only try to connect when any other method is called on window.nostr
+    // first check if we just got redirected from an auth_url
+    const state = localStorage.getItem(localStorageKeys.CALLBACK_TOKEN)
+    const qs = new URLSearchParams(window.location.search)
+    const callbackData = qs.get('wnjCallbackData') || ''
+    const [callbackState, relaysBlob, secret] = callbackData.split(';')
+    if (typeof state === 'string' && state !== '' && callbackState === state) {
+      // we did just got redirected
+      // the querystring item "wnjCallbackData" should have the data we need after the "state"
+      const relays = relaysBlob.split(',').filter(ru => ru.trim().length > 0)
 
-      identify()
+      // and the "pubkey" querystring item should have been added by the provider
+      const pubkey = qs.get('pubkey')
+      if (pubkey && relays.length > 0) {
+        // now we have everything we need to establish a bunker connection
+        bunkerPointer = {
+          relays,
+          pubkey,
+          secret: secret.length > 0 ? secret : null
+        }
+        identify(open)
+
+        // and store it
+        localStorage.setItem(
+          localStorageKeys.BUNKER_POINTER,
+          JSON.stringify(bunkerPointer)
+        )
+      }
+    }
+    localStorage.removeItem(localStorageKeys.CALLBACK_TOKEN)
+
+    // proceed with the normal flow and load bunker stuff from localStorage
+    if (!bunkerPointer) {
+      let data = localStorage.getItem(localStorageKeys.BUNKER_POINTER)
+      if (data) {
+        bunkerPointer = JSON.parse(data)
+        // we have a pointer, which means we can get the public key right away
+        // but we will only try to connect when any other method is called on window.nostr
+        identify()
+      }
     }
 
     if (win.nostr && !win.nostr.isWnj) {
@@ -280,7 +339,7 @@
 
   async function handleDisconnect(ev: MouseEvent) {
     ev.preventDefault()
-    localStorage.removeItem('wnj:bunkerPointer')
+    localStorage.removeItem(localStorageKeys.BUNKER_POINTER)
     reset()
   }
 
@@ -349,7 +408,10 @@
     try {
       await b.connect()
       connected = true
-      localStorage.setItem('wnj:bunkerPointer', JSON.stringify(bunkerPointer))
+      localStorage.setItem(
+        localStorageKeys.BUNKER_POINTER,
+        JSON.stringify(bunkerPointer)
+      )
       close()
       resolveBunker(b)
     } catch (err: any) {
@@ -362,8 +424,8 @@
     }
   }
 
-  function identify() {
-    let pubkey = bunkerPointer.pubkey
+  function identify(onFirstMetadata: (() => void) | null = null) {
+    let pubkey = bunkerPointer!.pubkey
 
     identity = {
       pubkey: pubkey,
@@ -386,6 +448,8 @@
             identity!.event = evt
             identity!.name = name
             identity!.picture = picture
+            onFirstMetadata?.()
+            onFirstMetadata = null
           } catch (err) {
             /***/
           }
@@ -447,8 +511,8 @@
         ypos = BASE_YPOS
       }
 
-      localStorage.setItem('wnj:origin', origin)
-      localStorage.setItem('wnj:ypos', ypos.toString())
+      localStorage.setItem(localStorageKeys.ORIGIN, origin)
+      localStorage.setItem(localStorageKeys.Y_POS, ypos.toString())
     }
   }
 </script>
