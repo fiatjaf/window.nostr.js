@@ -114,16 +114,19 @@
   const bunkerSignerParams: BunkerSignerParams = {
     pool,
     onauth(url: string) {
-      const popup = window.open(
+      const popup = null /* window.open(
         url,
         'window.nostr',
         `width=600,height=800,popup=yes`
-      )
+      )*/
       if (!popup) {
         const callbackUrl = new URL(window.location.href)
         const state = Math.random().toString().substring(2)
         localStorage.setItem(localStorageKeys.CALLBACK_TOKEN, state)
-        callbackUrl.searchParams.set('wnjCallbackData', state)
+        callbackUrl.searchParams.set(
+          'wnjCallbackData',
+          `${state}|${chosenProvider?.bunkerPointer.relays.join(',')}|${chosenProvider?.bunkerPointer.secret}`
+        )
 
         const redirectUrl = new URL(url)
         redirectUrl.searchParams.set('callbackUrl', callbackUrl.toString())
