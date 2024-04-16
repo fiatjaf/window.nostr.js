@@ -387,6 +387,7 @@
       clearTimeout(connectionTimeout)
       connecting = false
       takingTooLong = false
+      showAuth = null
     }
   }
 
