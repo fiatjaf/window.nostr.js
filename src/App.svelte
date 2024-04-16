@@ -70,6 +70,7 @@
   let connecting: boolean
   let connected: boolean
   let showAuth: string | null = null
+  let showLogin: string | null = null
   let takingTooLong = false
   let creating: boolean
   let awaitingCreation: boolean
@@ -116,9 +117,10 @@
   const bunkerSignerParams: BunkerSignerParams = {
     pool,
     onauth(url: string) {
-      const popup = null // openAuthURLPopup(url)
-      if (!popup) {
+      if (creating) {
         showAuth = url
+      } else {
+        showLogin = url
       }
     }
   }
@@ -258,6 +260,7 @@
     close()
     creating = false
     showAuth = null
+    showLogin = null
     ev.stopPropagation()
   }
 
@@ -388,6 +391,7 @@
       connecting = false
       takingTooLong = false
       showAuth = null
+      showLogin = null
     }
   }
 
@@ -545,7 +549,7 @@
         >⤫</button
       >
 
-      {#if !showInfo && !showAuth}
+      {#if !showInfo && !showAuth && !showLogin}
         <button
           on:click={handleShowInfo}
           class="absolute bottom-1 right-3 cursor-pointer bg-transparent text-xl text-{accent}-600"
@@ -564,6 +568,20 @@
             class="mt-4 block w-full cursor-pointer rounded border-0 px-2 py-1 text-lg text-white disabled:cursor-default disabled:bg-neutral-400 disabled:text-neutral-200 bg-{accent}-900 hover:bg-{accent}-950"
             on:click={() => openAuthURLPopup(showAuth)}>
             Start account creation »
+          </button>
+        </div>
+
+      {:else if showLogin}
+        <div class="m-auto w-full">
+          <div class="text-center text-lg">Login into a Nostr account</div>
+          <div class="mt-4 text-center text-sm leading-4">
+            Now you a new window will bring you to <strong>{new URL(showLogin).host}</strong> where you can login and approve the permissions. If nothing happens check that if your browser is blocking popups, pleaase.<br/>
+            After that you will be returned to this page.
+          </div>
+          <button
+            class="mt-4 block w-full cursor-pointer rounded border-0 px-2 py-1 text-lg text-white disabled:cursor-default disabled:bg-neutral-400 disabled:text-neutral-200 bg-{accent}-900 hover:bg-{accent}-950"
+            on:click={() => openAuthURLPopup(showLogin)}>
+            Login now »
           </button>
         </div>
 
