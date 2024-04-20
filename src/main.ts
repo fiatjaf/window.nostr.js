@@ -40,4 +40,19 @@ const app = new App({
   }
 })
 
+if (!win.wnjParams?.disableOverflowFix){
+  // Inject on the host page a style to avoid weird scrolling on the
+  // right/bottom on mobile, if the underlying page has some horizontal
+  // scrolling
+  var styleElement = document.createElement('style');
+  var cssCode = `
+    html, body {
+      overflow: auto;
+      height: 100%;
+    }
+  `;
+  styleElement.innerHTML = cssCode;
+  document.head.appendChild(styleElement);
+}
+
 export default app
