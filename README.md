@@ -18,6 +18,11 @@ The script supports some optional configurations to personalize the design:
     // The only accepted value is 'bottom', default is top
     accent: 'green',
     // Supported values: cyan (default), green, purple, red, orange, neutral, stone
+    disableOverflowFix: true,
+    // If the host page on mobile has an horizontal scrolling, the floating
+    // element/modal are pushed to the extreme right/bottom and exit the
+    // viewport. A style is injected in the html/body elements fix this.
+    // This option permit to disable this default behavior
   }
 </script>
 <script src="https://unpkg.com/window.nostr.js/dist/window.nostr.js"></script>
