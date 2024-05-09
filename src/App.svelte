@@ -71,6 +71,7 @@
   let connected: boolean
   let showAuth: string | null = null
   let showLogin: string | null = null
+  let showConfirmAction: string | null = null
   let takingTooLong = false
   let creating: boolean
   let awaitingCreation: boolean
@@ -119,6 +120,9 @@
     onauth(url: string) {
       if (creating) {
         showAuth = url
+      } else if(identity) {
+        showConfirmAction = url
+        opened = true
       } else {
         showLogin = url
       }
@@ -168,8 +172,13 @@
       return (await bunker).bp.pubkey
     },
     async signEvent(event: NostrEvent): Promise<VerifiedEvent> {
-      if (!connecting && !connected) connectOrOpen()
-      return (await bunker).signEvent(event)
+      try {
+        if (!connecting && !connected) connectOrOpen()
+        return await (await bunker).signEvent(event)
+      } finally {
+        showConfirmAction = null
+        close()
+      }
     },
     async getRelays(): Promise<{
       [url: string]: {read: boolean; write: boolean}
@@ -261,6 +270,7 @@
     creating = false
     showAuth = null
     showLogin = null
+    showConfirmAction = null
     ev.stopPropagation()
   }
 
@@ -394,6 +404,7 @@
       takingTooLong = false
       showAuth = null
       showLogin = null
+      showConfirmAction = null
     }
   }
 
@@ -551,7 +562,7 @@
         >⤫</button
       >
 
-      {#if !showInfo && !showAuth && !showLogin}
+      {#if !showInfo && !showAuth && !showLogin && !showConfirmAction}
         <button
           on:click={handleShowInfo}
           class="absolute bottom-1 right-3 cursor-pointer bg-transparent text-xl text-{accent}-600"
@@ -584,6 +595,20 @@
             class="mt-4 block w-full cursor-pointer rounded border-0 px-2 py-1 text-lg text-white disabled:cursor-default disabled:bg-neutral-400 disabled:text-neutral-200 bg-{accent}-900 hover:bg-{accent}-950"
             on:click={() => openAuthURLPopup(showLogin)}>
             Login now »
+          </button>
+        </div>
+
+        {:else if showConfirmAction}
+        <div class="m-auto w-full">
+          <div class="text-center text-lg">An action requires your confirmation</div>
+          <div class="mt-4 text-center text-sm leading-4">
+            Now you a new window will bring you to <strong>{new URL(showConfirmAction).host}</strong> where you can approve the current action. If nothing happens check that if your browser is blocking popups, pleaase.<br/>
+            After that you will be returned to this page.
+          </div>
+          <button
+            class="mt-4 block w-full cursor-pointer rounded border-0 px-2 py-1 text-lg text-white disabled:cursor-default disabled:bg-neutral-400 disabled:text-neutral-200 bg-{accent}-900 hover:bg-{accent}-950"
+            on:click={() => {openAuthURLPopup(showConfirmAction)}}>
+            Confirm action »
           </button>
         </div>
 
