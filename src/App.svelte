@@ -336,7 +336,9 @@
       chosenProvider,
       bunkerSignerParams,
       nameInput.value,
-      chosenProvider.domain
+      chosenProvider.domain,
+      undefined,
+      clientSecret
     )
     awaitingCreation = false
 
