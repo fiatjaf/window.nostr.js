@@ -545,8 +545,10 @@
           {:else}
             ☉
           {/if}
-          {identity.name ||
-            identity.npub.slice(0, 7) + '…' + identity.npub.slice(-4)}
+          <div class="max-w-56 overflow-hidden whitespace-nowrap overflow-ellipsis inline-block">
+            {identity.name ||
+              identity.npub.slice(0, 7) + '…' + identity.npub.slice(-4)}
+          </div>
         </div>
       {/if}
     </div>
