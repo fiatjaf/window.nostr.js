@@ -42,6 +42,7 @@
         | 'top'
         | 'bottom'
         | null) || position
+  export let startHidden: boolean
 
   const win = window as any
   const pool = new SimplePool()
@@ -522,7 +523,9 @@
   bind:this={myself}
 >
   <!-- Close status ################### -->
-  {#if !opened}
+  {#if !opened && !identity && startHidden}
+    <!-- Show nothing  -->
+  {:else if !opened}
     <div
       class="rounded px-4 py-2 shadow-[0_0px_10px_0px_rgba(0,0,0,0.3)] transition-all duration-200 bg-{accent}-700 hover:bg-{accent}-800 {movingStyle}"
     >
@@ -532,7 +535,6 @@
           Connecting to bunker
           <Spinner />
         </div>
-      {:else if !identity}
         Connect with Nostr
       {:else}
         <div class="flex items-center">

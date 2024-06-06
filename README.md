@@ -18,6 +18,9 @@ The script supports some optional configurations to personalize the design:
     // The only accepted value is 'bottom', default is top
     accent: 'green',
     // Supported values: cyan (default), green, purple, red, orange, neutral, stone
+    startHidden: true,
+    // If the host page has a button that call `getPublicKey` to start a
+    // login procedure, the minimized widget can be hidden until connected
     disableOverflowFix: true,
     // If the host page on mobile has an horizontal scrolling, the floating
     // element/modal are pushed to the extreme right/bottom and exit the

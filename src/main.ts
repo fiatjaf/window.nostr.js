@@ -36,7 +36,8 @@ const app = new App({
   target: mountPoint,
   props: {
     accent: win.wnjParams?.accent || 'cyan',
-    position: win.wnjParams?.position === 'bottom' ? 'bottom' : 'top'
+    position: win.wnjParams?.position === 'bottom' ? 'bottom' : 'top',
+    startHidden: win.wnjParams?.startHidden ? true : false,
   }
 })
 
