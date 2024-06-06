@@ -21,6 +21,8 @@ The script supports some optional configurations to personalize the design:
     startHidden: true,
     // If the host page has a button that call `getPublicKey` to start a
     // login procedure, the minimized widget can be hidden until connected
+    compactMode: true,
+    // Show the minimized widget in a compact form
     disableOverflowFix: true,
     // If the host page on mobile has an horizontal scrolling, the floating
     // element/modal are pushed to the extreme right/bottom and exit the

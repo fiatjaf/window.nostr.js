@@ -38,6 +38,7 @@ const app = new App({
     accent: win.wnjParams?.accent || 'cyan',
     position: win.wnjParams?.position === 'bottom' ? 'bottom' : 'top',
     startHidden: win.wnjParams?.startHidden ? true : false,
+    compactMode: win.wnjParams?.compactMode ? true : false,
   }
 })
 

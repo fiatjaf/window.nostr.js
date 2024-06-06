@@ -43,6 +43,7 @@
         | 'bottom'
         | null) || position
   export let startHidden: boolean
+  export let compactMode: boolean
 
   const win = window as any
   const pool = new SimplePool()
@@ -527,17 +528,22 @@
     <!-- Show nothing  -->
   {:else if !opened}
     <div
-      class="rounded px-4 py-2 shadow-[0_0px_10px_0px_rgba(0,0,0,0.3)] transition-all duration-200 bg-{accent}-700 hover:bg-{accent}-800 {movingStyle}"
+      class="rounded px-2 py-2 shadow-[0_0px_10px_0px_rgba(0,0,0,0.3)] transition-all duration-200 bg-{accent}-700 hover:bg-{accent}-800 {movingStyle}"
     >
       <!-- Connecting view ################### -->
       {#if connecting}
-        <div class="flex items-center">
+        <div class="flex px-2 items-center">
           Connecting to bunker
           <Spinner />
         </div>
-        Connect with Nostr
-      {:else}
-        <div class="flex items-center">
+      {:else if !identity && !compactMode}
+        <div class="flex px-2 items-center">
+          Connect with Nostr
+        </div>
+      {:else if !identity && compactMode}
+        <div class="w-6 text-center">N</div>
+      {:else if !compactMode}
+        <div class="flex px-2 items-center">
           {#if identity.picture}
             <img
               src={identity.picture}
@@ -552,6 +558,12 @@
               identity.npub.slice(0, 7) + '…' + identity.npub.slice(-4)}
           </div>
         </div>
+      {:else}
+        <img
+          src={identity.picture}
+          alt=""
+          class="h-6 w-6 rounded-full"
+        />
       {/if}
     </div>
 
