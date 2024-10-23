@@ -37,24 +37,24 @@ const app = new App({
   props: {
     accent: win.wnjParams?.accent || 'cyan',
     position: win.wnjParams?.position === 'bottom' ? 'bottom' : 'top',
-    startHidden: win.wnjParams?.startHidden ? true : false,
-    compactMode: win.wnjParams?.compactMode ? true : false,
+    startHidden: win.wnjParams?.startHidden,
+    compactMode: win.wnjParams?.compactMode
   }
 })
 
-if (!win.wnjParams?.disableOverflowFix){
+if (!win.wnjParams?.disableOverflowFix) {
   // Inject on the host page a style to avoid weird scrolling on the
   // right/bottom on mobile, if the underlying page has some horizontal
   // scrolling
-  var styleElement = document.createElement('style');
-  var cssCode = `
+  const styleElement = document.createElement('style')
+  const cssCode = `
     html, body {
       overflow: auto;
       height: 100%;
     }
-  `;
-  styleElement.innerHTML = cssCode;
-  document.head.appendChild(styleElement);
+  `
+  styleElement.innerHTML = cssCode
+  document.head.appendChild(styleElement)
 }
 
 export default app

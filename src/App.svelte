@@ -122,7 +122,7 @@
     onauth(url: string) {
       if (creating) {
         showAuth = url
-      } else if(identity) {
+      } else if (identity) {
         showConfirmAction = url
         opened = true
       } else {
@@ -532,18 +532,18 @@
     >
       <!-- Connecting view ################### -->
       {#if connecting}
-        <div class="flex px-2 items-center">
+        <div class="flex items-center px-2">
           Connecting to bunker
           <Spinner />
         </div>
-      {:else if !identity && !compactMode}
-        <div class="flex px-2 items-center">
-          Connect with Nostr
-        </div>
-      {:else if !identity && compactMode}
-        <div class="w-6 text-center">N</div>
+      {:else if !identity}
+        {#if compactMode}
+          <div class="w-6 text-center">N</div>
+        {:else}
+          <div class="flex items-center px-2">Connect with Nostr</div>
+        {/if}
       {:else if !compactMode}
-        <div class="flex px-2 items-center">
+        <div class="flex items-center px-2">
           {#if identity.picture}
             <img
               src={identity.picture}
@@ -551,19 +551,17 @@
               class="mr-2 h-5 w-5 rounded-full"
             />
           {:else}
-            ☉
+            <span class="mr-2">☉</span>
           {/if}
-          <div class="max-w-56 overflow-hidden whitespace-nowrap overflow-ellipsis inline-block">
+          <div
+            class="inline-block max-w-56 overflow-hidden overflow-ellipsis whitespace-nowrap"
+          >
             {identity.name ||
               identity.npub.slice(0, 7) + '…' + identity.npub.slice(-4)}
           </div>
         </div>
       {:else}
-        <img
-          src={identity.picture}
-          alt=""
-          class="h-6 w-6 rounded-full"
-        />
+        <img src={identity.picture} alt="" class="h-6 w-6 rounded-full" />
       {/if}
     </div>
 
@@ -590,40 +588,57 @@
         <div class="m-auto w-full">
           <div class="text-center text-lg">Create a Nostr account</div>
           <div class="mt-4 text-center text-sm leading-4">
-            Now you a new window will bring you to <strong>{new URL(showAuth).host}</strong> where the account creation will take place. If nothing happens check that if your browser is blocking popups, pleaase.<br/>
+            Now you a new window will bring you to <strong
+              >{new URL(showAuth).host}</strong
+            >
+            where the account creation will take place. If nothing happens check
+            that if your browser is blocking popups, pleaase.<br />
             After that you will be returned to this page.
           </div>
           <button
             class="mt-4 block w-full cursor-pointer rounded border-0 px-2 py-1 text-lg text-white disabled:cursor-default disabled:bg-neutral-400 disabled:text-neutral-200 bg-{accent}-900 hover:bg-{accent}-950"
-            on:click={() => openAuthURLPopup(showAuth)}>
+            on:click={() => openAuthURLPopup(showAuth)}
+          >
             Start account creation »
           </button>
         </div>
-
       {:else if showLogin}
         <div class="m-auto w-full">
           <div class="text-center text-lg">Login into a Nostr account</div>
           <div class="mt-4 text-center text-sm leading-4">
-            Now you a new window will bring you to <strong>{new URL(showLogin).host}</strong> where you can login and approve the permissions. If nothing happens check that if your browser is blocking popups, pleaase.<br/>
+            Now you a new window will bring you to <strong
+              >{new URL(showLogin).host}</strong
+            >
+            where you can login and approve the permissions. If nothing happens check
+            that if your browser is blocking popups, pleaase.<br />
             After that you will be returned to this page.
           </div>
           <button
             class="mt-4 block w-full cursor-pointer rounded border-0 px-2 py-1 text-lg text-white disabled:cursor-default disabled:bg-neutral-400 disabled:text-neutral-200 bg-{accent}-900 hover:bg-{accent}-950"
-            on:click={() => openAuthURLPopup(showLogin)}>
+            on:click={() => openAuthURLPopup(showLogin)}
+          >
             Login now »
           </button>
         </div>
-
-        {:else if showConfirmAction}
+      {:else if showConfirmAction}
         <div class="m-auto w-full">
-          <div class="text-center text-lg">An action requires your confirmation</div>
+          <div class="text-center text-lg">
+            An action requires your confirmation
+          </div>
           <div class="mt-4 text-center text-sm leading-4">
-            Now you a new window will bring you to <strong>{new URL(showConfirmAction).host}</strong> where you can approve the current action. If nothing happens check that if your browser is blocking popups, pleaase.<br/>
+            Now you a new window will bring you to <strong
+              >{new URL(showConfirmAction).host}</strong
+            >
+            where you can approve the current action. If nothing happens check that
+            if your browser is blocking popups, pleaase.<br />
             After that you will be returned to this page.
           </div>
           <button
             class="mt-4 block w-full cursor-pointer rounded border-0 px-2 py-1 text-lg text-white disabled:cursor-default disabled:bg-neutral-400 disabled:text-neutral-200 bg-{accent}-900 hover:bg-{accent}-950"
-            on:click={() => {openAuthURLPopup(showConfirmAction)}}>
+            on:click={() => {
+              openAuthURLPopup(showConfirmAction)
+            }}
+          >
             Confirm action »
           </button>
         </div>
