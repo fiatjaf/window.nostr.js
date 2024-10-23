@@ -214,9 +214,8 @@
       let data = localStorage.getItem(localStorageKeys.BUNKER_POINTER)
       if (data) {
         bunkerPointer = JSON.parse(data)
-        // we have a pointer, which means we can get the public key right away
-        // but we will only try to connect when any other method is called on window.nostr
         identify()
+        connect()
       }
     }
 
@@ -351,7 +350,7 @@
     creating = false
 
     bunkerPointer = bunker.bp
-    await identify()
+    identify()
     connect(bunker)
   }
 
