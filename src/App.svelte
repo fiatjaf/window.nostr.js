@@ -215,7 +215,13 @@
       if (data) {
         bunkerPointer = JSON.parse(data)
         identify()
-        connect()
+
+        // we must connect here so identify() works because we can't rely on the bunker params to read our pubkey
+        // however we may first check if we have it cached locally before doing the expensive connection
+        let cachedPubkey = localStorage.getItem(localStorageKeys.CACHED_PUBKEY)
+        if (!cachedPubkey) {
+          connect()
+        }
       }
     }
 
@@ -311,6 +317,7 @@
   async function handleDisconnect(ev: MouseEvent) {
     ev.preventDefault()
     localStorage.removeItem(localStorageKeys.BUNKER_POINTER)
+    localStorage.removeItem(localStorageKeys.CACHED_PUBKEY)
     reset()
   }
 
@@ -402,8 +409,16 @@
     }
   }
 
-  async function identify(onFirstMetadata: (() => void) | null = null) {
-    let pubkey = await (await bunker).getPublicKey()
+  // identify() is what gives a name and picture to our floating widget
+  async function identify() {
+    let pubkey = localStorage.getItem(localStorageKeys.CACHED_PUBKEY)
+    if (!pubkey) {
+      pubkey = await (await bunker).getPublicKey()
+
+      // store this pubkey here so we don't have to connect and get our pubkey immediately
+      // the next time we open this page
+      localStorage.setItem(localStorageKeys.CACHED_PUBKEY, pubkey)
+    }
 
     identity = {
       pubkey: pubkey,
@@ -426,8 +441,6 @@
             identity!.event = evt
             identity!.name = name
             identity!.picture = picture
-            onFirstMetadata?.()
-            onFirstMetadata = null
           } catch (err) {
             /***/
           }
