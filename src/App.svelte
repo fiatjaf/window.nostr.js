@@ -18,6 +18,7 @@
     type BunkerProfile,
     BUNKER_REGEX
   } from 'nostr-tools/nip46'
+  import {localStorageKeys} from './lib'
   import {NIP05_REGEX, queryProfile} from 'nostr-tools/nip05'
   import {npubEncode} from 'nostr-tools/nip19'
   import {onMount} from 'svelte'
@@ -25,13 +26,6 @@
   import Spinner from './Spinner.svelte'
 
   const mobileMode = mediaQueryStore('only screen and (max-width: 640px)')
-  const localStorageKeys = {
-    ORIGIN: 'wnj:origin',
-    CLIENT_SECRET: 'wnj:clientSecret',
-    Y_POS: 'wnj:ypos',
-    CALLBACK_TOKEN: 'wnj:callbackToken',
-    BUNKER_POINTER: 'wnj:bunkerPointer'
-  }
 
   let myself: HTMLDivElement
   export let accent: string

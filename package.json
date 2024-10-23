@@ -8,6 +8,7 @@
     "@tsconfig/svelte": "^5.0.2",
     "@typescript-eslint/eslint-plugin": "^7.0.1",
     "autoprefixer": "^10.4.17",
+    "esbuild": "^0.24.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-svelte": "^2.35.1",
     "postcss": "^8.4.35",
