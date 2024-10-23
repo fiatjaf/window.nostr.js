@@ -163,9 +163,8 @@
   let windowNostr = {
     isWnj: true,
     async getPublicKey(): Promise<string> {
-      if (bunkerPointer) return bunkerPointer.pubkey
       if (!connecting && !connected) open()
-      return (await bunker).bp.pubkey
+      return (await bunker).getPublicKey()
     },
     async signEvent(event: NostrEvent): Promise<VerifiedEvent> {
       try {
@@ -352,7 +351,7 @@
     creating = false
 
     bunkerPointer = bunker.bp
-    identify()
+    await identify()
     connect(bunker)
   }
 
@@ -404,8 +403,8 @@
     }
   }
 
-  function identify(onFirstMetadata: (() => void) | null = null) {
-    let pubkey = bunkerPointer!.pubkey
+  async function identify(onFirstMetadata: (() => void) | null = null) {
+    let pubkey = await (await bunker).getPublicKey()
 
     identity = {
       pubkey: pubkey,
