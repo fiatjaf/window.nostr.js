@@ -4,14 +4,9 @@ set unstable
 dev:
   vite --port 13471
 
-build: wnj iframe
-
-wnj:
+build:
   vite build
   mv dist/assets/*.js dist/window.nostr.js
-
-iframe:
-  node ./iframe/build.js
 
 demo:
   xdg-open demo/index.html

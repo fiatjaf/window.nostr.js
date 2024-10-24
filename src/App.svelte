@@ -845,6 +845,6 @@
     title="~"
     bind:this={iframe}
     on:load={onIframeLoaded}
-    src="https://the-nostr.org/iframe.html"
+    src="https://join.the-nostr.org/iframe.html"
   ></iframe>
 {/if}
