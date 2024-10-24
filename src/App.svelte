@@ -18,7 +18,6 @@
     type BunkerProfile,
     BUNKER_REGEX
   } from 'nostr-tools/nip46'
-  import {localStorageKeys} from './lib'
   import {NIP05_REGEX, queryProfile} from 'nostr-tools/nip05'
   import {npubEncode} from 'nostr-tools/nip19'
   import {onMount} from 'svelte'
@@ -26,36 +25,42 @@
   import Spinner from './Spinner.svelte'
 
   const mobileMode = mediaQueryStore('only screen and (max-width: 640px)')
+  const lskeys = {
+    ORIGIN: 'wnj:origin',
+    CLIENT_SECRET: 'wnj:clientSecret',
+    Y_POS: 'wnj:ypos',
+    CALLBACK_TOKEN: 'wnj:callbackToken',
+    BUNKER_POINTER: 'wnj:bunkerPointer',
+    CACHED_PUBKEY: 'wnj:cachedPubKey',
+    IGNORE_IFRAME: 'wnj:ignoreIframe'
+  }
 
   let myself: HTMLDivElement
   export let accent: string
   export let position: 'top' | 'bottom' = 'top'
   $: origin = $mobileMode
     ? 'bottom'
-    : (localStorage.getItem(localStorageKeys.ORIGIN) as
-        | 'top'
-        | 'bottom'
-        | null) || position
+    : (localStorage.getItem(lskeys.ORIGIN) as 'top' | 'bottom' | null) ||
+      position
   export let startHidden: boolean
   export let compactMode: boolean
 
   const win = window as any
   const pool = new SimplePool()
+  let useIframe = false
+  let iframe: HTMLIFrameElement | undefined
   let bunkerInput: HTMLInputElement
   let bunkerInputValue: string
   let nameInput: HTMLInputElement
   let nameInputValue: string
   let chosenProvider: BunkerProfile | undefined
   let clientSecret: Uint8Array
-  const local = localStorage.getItem(localStorageKeys.CLIENT_SECRET)
+  const local = localStorage.getItem(lskeys.CLIENT_SECRET)
   if (local) {
     clientSecret = hexToBytes(local)
   } else {
     clientSecret = generateSecretKey()
-    localStorage.setItem(
-      localStorageKeys.CLIENT_SECRET,
-      bytesToHex(clientSecret)
-    )
+    localStorage.setItem(lskeys.CLIENT_SECRET, bytesToHex(clientSecret))
   }
 
   let state: 'opened' | 'closed' | 'justopened' | 'justclosed' = 'closed'
@@ -91,7 +96,7 @@
   export let right = 20
   $: ypos = $mobileMode
     ? BASE_YPOS
-    : parseInt(localStorage.getItem(localStorageKeys.Y_POS) || '0') || BASE_YPOS
+    : parseInt(localStorage.getItem(lskeys.Y_POS) || '0') || BASE_YPOS
   let dragStarted = false
   let hasMoved = false
   let insidePosition: number
@@ -211,16 +216,21 @@
 
   onMount(() => {
     if (!bunkerPointer) {
-      let data = localStorage.getItem(localStorageKeys.BUNKER_POINTER)
+      let data = localStorage.getItem(lskeys.BUNKER_POINTER)
       if (data) {
         bunkerPointer = JSON.parse(data)
         identify()
 
         // we must connect here so identify() works because we can't rely on the bunker params to read our pubkey
         // however we may first check if we have it cached locally before doing the expensive connection
-        let cachedPubkey = localStorage.getItem(localStorageKeys.CACHED_PUBKEY)
+        let cachedPubkey = localStorage.getItem(lskeys.CACHED_PUBKEY)
         if (!cachedPubkey) {
           connect()
+        }
+      } else {
+        // when we don't have any bunker data stored, we can still check the iframe for it
+        if (!localStorage.getItem(lskeys.IGNORE_IFRAME)) {
+          useIframe = true
         }
       }
     }
@@ -253,6 +263,21 @@
       if (metadataSub) metadataSub.close()
     }
   })
+
+  function onIframeLoaded() {
+    window.addEventListener('message', handleMessage)
+    iframe?.contentWindow?.postMessage({getbunker: true}, '*')
+
+    async function handleMessage(ev: MessageEvent) {
+      let {bunker} = ev.data
+      if (bunker) {
+        bunkerPointer = await parseBunkerInput(bunker)
+        identify()
+        connect()
+        window.removeEventListener('message', handleMessage)
+      }
+    }
+  }
 
   function handleClick(ev: MouseEvent) {
     if (Math.abs(ypos - yposStart) > 6 || Date.now() - clickStart > 600) {
@@ -316,8 +341,9 @@
 
   async function handleDisconnect(ev: MouseEvent) {
     ev.preventDefault()
-    localStorage.removeItem(localStorageKeys.BUNKER_POINTER)
-    localStorage.removeItem(localStorageKeys.CACHED_PUBKEY)
+    localStorage.removeItem(lskeys.BUNKER_POINTER)
+    localStorage.removeItem(lskeys.CACHED_PUBKEY)
+    localStorage.setItem(lskeys.IGNORE_IFRAME, '')
     reset()
   }
 
@@ -390,10 +416,7 @@
     try {
       await b.connect()
       connected = true
-      localStorage.setItem(
-        localStorageKeys.BUNKER_POINTER,
-        JSON.stringify(bunkerPointer)
-      )
+      localStorage.setItem(lskeys.BUNKER_POINTER, JSON.stringify(bunkerPointer))
       close()
       resolveBunker(b)
     } catch (err: any) {
@@ -411,13 +434,13 @@
 
   // identify() is what gives a name and picture to our floating widget
   async function identify() {
-    let pubkey = localStorage.getItem(localStorageKeys.CACHED_PUBKEY)
+    let pubkey = localStorage.getItem(lskeys.CACHED_PUBKEY)
     if (!pubkey) {
       pubkey = await (await bunker).getPublicKey()
 
       // store this pubkey here so we don't have to connect and get our pubkey immediately
       // the next time we open this page
-      localStorage.setItem(localStorageKeys.CACHED_PUBKEY, pubkey)
+      localStorage.setItem(lskeys.CACHED_PUBKEY, pubkey)
     }
 
     identity = {
@@ -502,8 +525,8 @@
         ypos = BASE_YPOS
       }
 
-      localStorage.setItem(localStorageKeys.ORIGIN, origin)
-      localStorage.setItem(localStorageKeys.Y_POS, ypos.toString())
+      localStorage.setItem(lskeys.ORIGIN, origin)
+      localStorage.setItem(lskeys.Y_POS, ypos.toString())
     }
   }
 </script>
@@ -817,3 +840,11 @@
     </div>
   {/if}
 </div>
+{#if useIframe}
+  <iframe
+    title="~"
+    bind:this={iframe}
+    on:load={onIframeLoaded}
+    src="https://the-nostr.org/iframe.html"
+  ></iframe>
+{/if}

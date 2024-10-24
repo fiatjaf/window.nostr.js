@@ -12,7 +12,6 @@ wnj:
 
 iframe:
   node ./iframe/build.js
-  cp ./iframe/iframe.html dist/
 
 demo:
   xdg-open demo/index.html

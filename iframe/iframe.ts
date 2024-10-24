@@ -1,21 +1,28 @@
-import {parseBunkerInput} from 'nostr-tools/nip46'
-import {localStorageKeys} from '../src/lib'
+const SHARED_BUNKER_KEY = 'wnj:root:sharedBunker'
 
 window.onmessage = async (ev: MessageEvent) => {
-  if (
-    !ev.origin.startsWith('https://join.the-nostr.org') &&
-    !ev.origin.startsWith('http://localhost:6711')
-  ) {
-    return
-  }
+  const {bunker, getbunker} = ev.data
 
-  const {bunker} = ev.data
+  // set the bunker URL
   if (bunker) {
-    const bp = await parseBunkerInput(bunker)
-    if (bp) {
-      localStorage.setItem(localStorageKeys.BUNKER_POINTER, JSON.stringify(bp))
+    // we only accept these websites to be setting the bunker URL
+    if (
+      !ev.origin.startsWith('https://join.the-nostr.org') &&
+      !ev.origin.startsWith('http://localhost:6711')
+    ) {
+      return
+    }
+
+    if (bunker) {
+      localStorage.setItem(SHARED_BUNKER_KEY, bunker)
     } else {
       console.error('wnj iframe got an invalid bunker url:', bunker)
     }
+  }
+
+  if (getbunker) {
+    // any website can get the bunker URL if it is set
+    const bunker = localStorage.getItem(SHARED_BUNKER_KEY)
+    window.parent.postMessage({bunker}, '*') // we reply even if it's undefined so they know
   }
 }
