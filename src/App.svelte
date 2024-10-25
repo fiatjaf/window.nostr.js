@@ -32,7 +32,6 @@
     CALLBACK_TOKEN: 'wnj:callbackToken',
     BUNKER_POINTER: 'wnj:bunkerPointer',
     CACHED_PUBKEY: 'wnj:cachedPubKey',
-    IGNORE_IFRAME: 'wnj:ignoreIframe'
   }
 
   let myself: HTMLDivElement
@@ -47,8 +46,6 @@
 
   const win = window as any
   const pool = new SimplePool()
-  let useIframe = false
-  let iframe: HTMLIFrameElement | undefined
   let bunkerInput: HTMLInputElement
   let bunkerInputValue: string
   let nameInput: HTMLInputElement
@@ -227,11 +224,6 @@
         if (!cachedPubkey) {
           connect()
         }
-      } else {
-        // when we don't have any bunker data stored, we can still check the iframe for it
-        if (!localStorage.getItem(lskeys.IGNORE_IFRAME)) {
-          useIframe = true
-        }
       }
     }
 
@@ -263,21 +255,6 @@
       if (metadataSub) metadataSub.close()
     }
   })
-
-  function onIframeLoaded() {
-    window.addEventListener('message', handleMessage)
-    iframe?.contentWindow?.postMessage({getbunker: true}, '*')
-
-    async function handleMessage(ev: MessageEvent) {
-      let {bunker} = ev.data
-      if (bunker) {
-        bunkerPointer = await parseBunkerInput(bunker)
-        identify()
-        connect()
-        window.removeEventListener('message', handleMessage)
-      }
-    }
-  }
 
   function handleClick(ev: MouseEvent) {
     if (Math.abs(ypos - yposStart) > 6 || Date.now() - clickStart > 600) {
@@ -343,7 +320,6 @@
     ev.preventDefault()
     localStorage.removeItem(lskeys.BUNKER_POINTER)
     localStorage.removeItem(lskeys.CACHED_PUBKEY)
-    localStorage.setItem(lskeys.IGNORE_IFRAME, '')
     reset()
   }
 
@@ -840,11 +816,3 @@
     </div>
   {/if}
 </div>
-{#if useIframe}
-  <iframe
-    title="~"
-    bind:this={iframe}
-    on:load={onIframeLoaded}
-    src="https://join.the-nostr.org/iframe.html"
-  ></iframe>
-{/if}
