@@ -1,6 +1,6 @@
 {
   "name": "window.nostr.js",
-  "version": "0.4.4",
+  "version": "0.4.5",
   "type": "module",
   "main": "dist/window.nostr.js",
   "devDependencies": {
@@ -24,6 +24,6 @@
   },
   "dependencies": {
     "debounce": "2.0.0",
-    "nostr-tools": "2.9.2"
+    "nostr-tools": "2.9.3"
   }
 }

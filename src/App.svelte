@@ -13,10 +13,10 @@
     type BunkerSignerParams,
     createAccount,
     parseBunkerInput,
-    fetchBunkerProviders,
     type BunkerPointer,
     type BunkerProfile,
-    BUNKER_REGEX
+    BUNKER_REGEX,
+    queryBunkerProfile
   } from 'nostr-tools/nip46'
   import {NIP05_REGEX, queryProfile} from 'nostr-tools/nip05'
   import {npubEncode} from 'nostr-tools/nip19'
@@ -31,7 +31,7 @@
     Y_POS: 'wnj:ypos',
     CALLBACK_TOKEN: 'wnj:callbackToken',
     BUNKER_POINTER: 'wnj:bunkerPointer',
-    CACHED_PUBKEY: 'wnj:cachedPubKey',
+    CACHED_PUBKEY: 'wnj:cachedPubKey'
   }
 
   let myself: HTMLDivElement
@@ -83,7 +83,18 @@
     event: NostrEvent | null
   }
   let metadataSub: SubCloser | null
-  let providers: BunkerProfile[] = []
+  let providers: BunkerProfile[] = [
+    {
+      picture: 'https://nsec.app/favicon.ico',
+      name: 'Nsec.app',
+      about:
+        'Store keys safely without a browser extension! Nsec.app is a non-custodial web app that can be connected to Nostr apps and provide restricted access to your keys.',
+      nip05: '_@nsec.app',
+      website: 'https://nsec.app',
+      domain: 'nsec.app'
+    } as BunkerProfile
+  ]
+
   const connectBunkerError =
     'We could not connect to a NIP-46 bunker with that url, are you sure it is set up correctly?'
   const connectNip05Error =
@@ -326,13 +337,31 @@
   async function handleOpenCreate(ev: MouseEvent) {
     ev.preventDefault()
     creating = true
-    if (providers.length === 0) {
-      providers = await fetchBunkerProviders(pool, [
-        'wss://relay.nostr.band',
-        'wss://nos.lol',
-        'wss://nostr-pub.wellorder.net'
-      ])
-      chosenProvider = providers[0]
+
+    if (providers.length > 0 && providers[0].bunkerPointer == null) {
+      let toRemove: BunkerProfile[] = []
+      let promises: Promise<void>[] = []
+
+      for (let i = 0; i < providers.length; i++) {
+        let promise = queryBunkerProfile(providers[i].nip05).then(
+          (bp: BunkerPointer | null) => {
+            if (!bp) {
+              toRemove.push(providers[i])
+            } else {
+              providers[i].bunkerPointer = bp
+            }
+          }
+        )
+        promises.push(promise)
+      }
+
+      await Promise.all(promises)
+      for (let r = 0; r < toRemove.length; r++) {
+        let idx = providers.indexOf(toRemove[r])
+        providers.splice(idx, 1)
+      }
+
+      providers = providers
     }
   }
 
