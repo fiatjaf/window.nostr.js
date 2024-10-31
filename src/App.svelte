@@ -544,7 +544,7 @@
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->
 <div
-  class="draggable animate-fadein font-sans text-white"
+  class="draggable z-[9000] animate-fadein font-sans text-white"
   class:cursor-pointer={!identity && !opened}
   style="position: fixed; {opened && $mobileMode
     ? 'width: 100vw;'
