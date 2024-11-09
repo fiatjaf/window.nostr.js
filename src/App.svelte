@@ -71,6 +71,7 @@
   let showLogin: string | null = null
   let showConfirmAction: string | null = null
   let takingTooLong = false
+  let hasTriedToConnectButFailed = false
   let creating: boolean
   let awaitingCreation: boolean
   let errorMessage: string
@@ -112,7 +113,6 @@
   let clickStart: number
 
   $: opened = state === 'justopened' || state === 'opened'
-
   $: movingStyle = hasMoved
     ? 'cursor-grabbing outline-dashed outline-' +
       accent +
@@ -131,7 +131,7 @@
         showAuth = url
       } else if (identity) {
         showConfirmAction = url
-        opened = true
+        state = 'opened'
       } else {
         showLogin = url
       }
@@ -226,7 +226,19 @@
     if (!bunkerPointer) {
       let data = localStorage.getItem(lskeys.BUNKER_POINTER)
       if (data) {
-        bunkerPointer = JSON.parse(data)
+        bunkerPointer = JSON.parse(data) as BunkerPointer
+
+        // rebuild a bunker url from the pointer data so we can fill in the input
+        let bunkerURL = new URL(`bunker://${bunkerPointer.pubkey}`)
+        bunkerPointer.relays.forEach(relay => {
+          bunkerURL.searchParams.append('relay', relay)
+        })
+        if (bunkerPointer.secret) {
+          bunkerURL.searchParams.set('secret', bunkerPointer.secret)
+        }
+        bunkerInputValue = bunkerURL.toString()
+        // ~
+
         identify()
 
         // we must connect here so identify() works because we can't rely on the bunker params to read our pubkey
@@ -300,9 +312,9 @@
   async function handleConnect(ev: SubmitEvent) {
     ev.preventDefault()
     try {
-      bunkerPointer = await parseBunkerInput(bunkerInput.value)
+      bunkerPointer = await parseBunkerInput(bunkerInputValue)
       if (!bunkerPointer) {
-        if (bunkerInput.value.match(BUNKER_REGEX)) {
+        if (bunkerInputValue.match(BUNKER_REGEX)) {
           errorMessage = connectBunkerError
         } else {
           errorMessage = connectNip05Error
@@ -318,7 +330,7 @@
       // wait until the connection has succeeded before loading user data
       identify()
     } catch (error) {
-      if (bunkerInput.value.match(BUNKER_REGEX)) {
+      if (bunkerInputValue.match(BUNKER_REGEX)) {
         errorMessage = connectBunkerError
       } else {
         errorMessage = connectNip05Error
@@ -365,6 +377,14 @@
     }
   }
 
+  async function handleErasePointer(ev: MouseEvent) {
+    ev.preventDefault()
+    bunkerInputValue = ''
+    localStorage.removeItem(lskeys.BUNKER_POINTER)
+    localStorage.removeItem(lskeys.CACHED_PUBKEY)
+    hasTriedToConnectButFailed = false
+  }
+
   function handleOpenLogin(_: MouseEvent) {
     creating = false
   }
@@ -407,6 +427,7 @@
     connecting = false
     rejectBunker('connection aborted')
     reset()
+    open()
   }
 
   async function connect(b: BunkerSigner | undefined = undefined) {
@@ -415,7 +436,7 @@
 
     let connectionTimeout = setTimeout(() => {
       takingTooLong = true
-      opened = true
+      state = 'opened'
     }, 5000)
 
     try {
@@ -441,11 +462,16 @@
   async function identify() {
     let pubkey = localStorage.getItem(lskeys.CACHED_PUBKEY)
     if (!pubkey) {
-      pubkey = await (await bunker).getPublicKey()
+      try {
+        pubkey = await (await bunker).getPublicKey()
 
-      // store this pubkey here so we don't have to connect and get our pubkey immediately
-      // the next time we open this page
-      localStorage.setItem(lskeys.CACHED_PUBKEY, pubkey)
+        // store this pubkey here so we don't have to connect and get our pubkey immediately
+        // the next time we open this page
+        localStorage.setItem(lskeys.CACHED_PUBKEY, pubkey)
+      } catch (err) {
+        hasTriedToConnectButFailed = true
+        return
+      }
     }
 
     identity = {
@@ -795,11 +821,19 @@
         </form>
         {#if !connecting}
           <div class="mt-6 text-center text-sm leading-3">
-            Do you need a Nostr account?<br />
-            <button
-              class="cursor-pointer border-0 bg-transparent text-sm text-white underline"
-              on:click={handleOpenCreate}>Sign up now</button
-            >
+            {#if hasTriedToConnectButFailed}
+              Is this bunker provider broken?<br />
+              <button
+                class="cursor-pointer border-0 bg-transparent text-sm text-white underline"
+                on:click={handleErasePointer}>Clear it</button
+              >
+            {:else}
+              Do you need a Nostr account?<br />
+              <button
+                class="cursor-pointer border-0 bg-transparent text-sm text-white underline"
+                on:click={handleOpenCreate}>Sign up now</button
+              >
+            {/if}
           </div>
         {/if}
 
