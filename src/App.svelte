@@ -24,6 +24,9 @@
   import mediaQueryStore from './mediaQueryStore.js'
   import Spinner from './Spinner.svelte'
 
+  const currentDomain = window.location.hostname
+  const currentProtocol = window.location.protocol
+
   const mobileMode = mediaQueryStore('only screen and (max-width: 640px)')
   const lskeys = {
     ORIGIN: 'wnj:origin',
@@ -61,6 +64,7 @@
   }
 
   let state: 'opened' | 'closed' | 'justopened' | 'justclosed' = 'closed'
+  let nostrLogin = false
   let bunkerPointer: BunkerPointer | null
   let resolveBunker: (_: BunkerSigner) => void
   let rejectBunker: (_: string) => void
@@ -223,6 +227,28 @@
   }
 
   onMount(() => {
+    // Verify Nstart callback if the hash contains "nostr-login"
+    const hash = window.location.hash
+    if (hash.startsWith('#nostr-login=')) {
+      // Extract the value after "nostr-login="
+      const value = hash.substring(hash.indexOf('=') + 1)
+
+      // Reset nostr-login data
+      const urlWithoutHash = window.location.href.split('#')[0]
+      history.replaceState(null, '', urlWithoutHash)
+
+      if (value.startsWith('bunker://')) {
+        bunkerInputValue = value
+        const event = new SubmitEvent('submit', {
+          bubbles: true,
+          cancelable: true
+        })
+        nostrLogin = true
+        open()
+        handleConnect(event)
+      }
+    }
+
     if (!bunkerPointer) {
       let data = localStorage.getItem(lskeys.BUNKER_POINTER)
       if (data) {
@@ -455,6 +481,9 @@
       showAuth = null
       showLogin = null
       showConfirmAction = null
+      if (nostrLogin) {
+        open()
+      }
     }
   }
 
@@ -734,39 +763,19 @@
         <!-- Create account view ################### -->
       {:else if creating}
         <div class="text-center text-lg">Create a Nostr account</div>
-        <form class="mb-1 mt-4" on:submit={handleCreate}>
-          <div class="flex flex-row">
-            <!-- svelte-ignore a11y-autofocus -->
-            <input
-              class="box-border w-40 rounded px-2 py-1 text-lg text-neutral-800 outline-none"
-              placeholder="bob"
-              bind:this={nameInput}
-              bind:value={nameInputValue}
-              on:input={checkNameInput}
-              autofocus
-              autocapitalize="none"
-            />
-            <div class="mx-2 text-2xl">@</div>
-            <select
-              class="box-border w-full rounded px-2 py-1 text-lg text-neutral-800 outline-none"
-              bind:value={chosenProvider}
-            >
-              {#each providers as prov}
-                <option
-                  label={prov.domain}
-                  value={prov}
-                  class="px-2 py-1 text-lg"
-                />
-              {/each}
-            </select>
-          </div>
-          <button
-            class="mt-4 block w-full cursor-pointer rounded border-0 px-2 py-1 text-lg text-white disabled:cursor-default disabled:bg-neutral-400 disabled:text-neutral-200 bg-{accent}-900 hover:bg-{accent}-950"
-            disabled={!chosenProvider || !nameInputValue || awaitingCreation}
-          >
-            Continue »
-          </button>
-        </form>
+        <div class="mt-4 text-base leading-5">
+          To use this Nostr app you need a profile. The following button opens a
+          wizard that help you to create your keypair and safely manage it in a
+          few steps. Are you ready?
+        </div>
+        <button
+          class="mt-4 block w-full cursor-pointer rounded border-0 px-2 py-1 text-lg text-white disabled:cursor-default disabled:bg-neutral-400 disabled:text-neutral-200 bg-{accent}-900 hover:bg-{accent}-950"
+          on:click={() => {
+            window.location.href = `https://start.njump.me?an=${currentDomain}&at=web&ac=${currentProtocol}//${currentDomain}`
+          }}
+          disabled={awaitingCreation}
+          >Create the account »
+        </button>
         <div class="mt-6 text-center text-sm leading-3">
           Do you already have a Nostr address?<br />
           <button
