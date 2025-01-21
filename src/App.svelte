@@ -771,7 +771,7 @@
         <button
           class="mt-4 block w-full cursor-pointer rounded border-0 px-2 py-1 text-lg text-white disabled:cursor-default disabled:bg-neutral-400 disabled:text-neutral-200 bg-{accent}-900 hover:bg-{accent}-950"
           on:click={() => {
-            window.location.href = `https://start.njump.me?an=${currentDomain}&at=web&ac=${currentProtocol}//${currentDomain}`
+            window.location.href = `https://start.njump.me?an=${currentDomain}&at=web&ac=${currentProtocol}//${currentDomain}&sfb=yes`
           }}
           disabled={awaitingCreation}
           >Create the account »
