@@ -11,14 +11,13 @@
   import {
     BunkerSigner,
     type BunkerSignerParams,
-    createAccount,
     parseBunkerInput,
     type BunkerPointer,
     type BunkerProfile,
     BUNKER_REGEX,
     queryBunkerProfile
   } from 'nostr-tools/nip46'
-  import {NIP05_REGEX, queryProfile} from 'nostr-tools/nip05'
+  import {NIP05_REGEX} from 'nostr-tools/nip05'
   import {npubEncode} from 'nostr-tools/nip19'
   import {onMount} from 'svelte'
   import mediaQueryStore from './mediaQueryStore.js'
@@ -51,9 +50,6 @@
   const pool = new SimplePool()
   let bunkerInput: HTMLInputElement
   let bunkerInputValue: string
-  let nameInput: HTMLInputElement
-  let nameInputValue: string
-  let chosenProvider: BunkerProfile | undefined
   let clientSecret: Uint8Array
   const local = localStorage.getItem(lskeys.CLIENT_SECRET)
   if (local) {
@@ -195,8 +191,7 @@
     async getRelays(): Promise<{
       [url: string]: {read: boolean; write: boolean}
     }> {
-      if (!connecting && !connected) connectOrOpen()
-      return (await bunker).getRelays()
+      return {}
     },
     nip04: {
       async encrypt(pubkey: string, plaintext: string): Promise<string> {
@@ -414,39 +409,6 @@
   function handleOpenLogin(_: MouseEvent) {
     creating = false
   }
-
-  async function handleCreate(ev: SubmitEvent) {
-    ev.preventDefault()
-    if (!chosenProvider) return
-
-    awaitingCreation = true
-    let bunker = await createAccount(
-      chosenProvider,
-      bunkerSignerParams,
-      nameInput.value,
-      chosenProvider.domain,
-      undefined,
-      clientSecret
-    )
-    awaitingCreation = false
-
-    open()
-    creating = false
-
-    bunkerPointer = bunker.bp
-    identify()
-    connect(bunker)
-  }
-
-  const checkNameInput = debounce(async () => {
-    if (chosenProvider && nameInput.value.length > 0) {
-      if (await queryProfile(nameInput.value + '@' + chosenProvider.domain)) {
-        nameInput.setCustomValidity(`'${nameInput.value}' is already taken.`)
-      } else {
-        nameInput.setCustomValidity('')
-      }
-    }
-  }, 500)
 
   function handleAbortConnection() {
     takingTooLong = false
