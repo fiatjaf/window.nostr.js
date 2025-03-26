@@ -176,7 +176,7 @@
   let windowNostr = {
     isWnj: true,
     async getPublicKey(): Promise<string> {
-      if (!connecting && !connected) open()
+      if (!connecting && !connected) connectOrOpen()
       return (await bunker).getPublicKey()
     },
     async signEvent(event: NostrEvent): Promise<VerifiedEvent> {
