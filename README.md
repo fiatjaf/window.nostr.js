@@ -6,7 +6,7 @@ It adds a small floating button on the side of the window that users can use to 
 
 ## How to use it
 
-Include `<script src="https://unpkg.com/window.nostr.js/dist/window.nostr.js"></script>` in your HTML and proceed to use [`window.nostr`](https://nips.nostr.com/7) normally.
+Include `<script src="https://cdn.jsdelivr.net/npm/window.nostr.js/dist/window.nostr.min.js"></script>` in your HTML and proceed to use [`window.nostr`](https://nips.nostr.com/7) normally.
 
 ## Customization
 The script supports some optional configurations to personalize the design:
@@ -30,7 +30,7 @@ The script supports some optional configurations to personalize the design:
     // This option permit to disable this default behavior
   }
 </script>
-<script src="https://unpkg.com/window.nostr.js/dist/window.nostr.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/window.nostr.js/dist/window.nostr.min.js"></script>
 ```
 
 ## Bookmarklet
@@ -38,7 +38,7 @@ The script supports some optional configurations to personalize the design:
 If a website has opted to not include this, but you like it, you can still use it on the website. Just add this to your browser bookmarks and click on it to load the widget on any website:
 
 ```
-javascript:void((function(){var%20e=document.createElement('script');e.setAttribute('src','https://unpkg.com/window.nostr.js/dist/window.nostr.js');document.body.appendChild(e)})())
+javascript:void((function(){var%20e=document.createElement('script');e.setAttribute('src','https://cdn.jsdelivr.net/npm/window.nostr.js/dist/window.nostr.min.js');document.body.appendChild(e)})())
 ```
 
 ## Demo videos
@@ -46,4 +46,3 @@ javascript:void((function(){var%20e=document.createElement('script');e.setAttrib
 https://github.com/fiatjaf/window.nostr.js/assets/1653275/eacb1302-bbfd-4d28-aec2-dbe231f92c53
 
 https://github.com/fiatjaf/window.nostr.js/assets/1653275/8c2546f1-439a-4a1b-beb6-af540de37601
-
