@@ -30,8 +30,7 @@
     CLIENT_SECRET: 'wnj:clientSecret',
     Y_POS: 'wnj:ypos',
     CALLBACK_TOKEN: 'wnj:callbackToken',
-    BUNKER_POINTER: 'wnj:bunkerPointer',
-    CACHED_PUBKEY: 'wnj:cachedPubKey'
+    BUNKER_POINTER: 'wnj:bunkerPointer'
   }
 
   let myself: HTMLDivElement
@@ -250,11 +249,7 @@
         identify()
 
         // we must connect here so identify() works because we can't rely on the bunker params to read our pubkey
-        // however we may first check if we have it cached locally before doing the expensive connection
-        let cachedPubkey = localStorage.getItem(lskeys.CACHED_PUBKEY)
-        if (!cachedPubkey) {
-          connect()
-        }
+        connect()
       }
     }
 
@@ -350,7 +345,6 @@
   async function handleDisconnect(ev: MouseEvent) {
     ev.preventDefault()
     localStorage.removeItem(lskeys.BUNKER_POINTER)
-    localStorage.removeItem(lskeys.CACHED_PUBKEY)
     reset()
   }
 
@@ -358,7 +352,6 @@
     ev.preventDefault()
     bunkerInputValue = ''
     localStorage.removeItem(lskeys.BUNKER_POINTER)
-    localStorage.removeItem(lskeys.CACHED_PUBKEY)
     hasTriedToConnectButFailed = false
   }
 
@@ -407,18 +400,12 @@
 
   // identify() is what gives a name and picture to our floating widget
   async function identify() {
-    let pubkey = localStorage.getItem(lskeys.CACHED_PUBKEY)
-    if (!pubkey) {
-      try {
-        pubkey = await (await bunker).getPublicKey()
-
-        // store this pubkey here so we don't have to connect and get our pubkey immediately
-        // the next time we open this page
-        localStorage.setItem(lskeys.CACHED_PUBKEY, pubkey)
-      } catch (err) {
-        hasTriedToConnectButFailed = true
-        return
-      }
+    let pubkey: string
+    try {
+      pubkey = await (await bunker).getPublicKey()
+    } catch (err) {
+      hasTriedToConnectButFailed = true
+      return
     }
 
     identity = {
