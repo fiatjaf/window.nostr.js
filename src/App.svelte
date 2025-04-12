@@ -13,9 +13,7 @@
     type BunkerSignerParams,
     parseBunkerInput,
     type BunkerPointer,
-    type BunkerProfile,
-    BUNKER_REGEX,
-    queryBunkerProfile
+    BUNKER_REGEX
   } from 'nostr-tools/nip46'
   import {NIP05_REGEX} from 'nostr-tools/nip05'
   import {npubEncode} from 'nostr-tools/nip19'
@@ -84,17 +82,6 @@
     event: NostrEvent | null
   }
   let metadataSub: SubCloser | null
-  let providers: BunkerProfile[] = [
-    {
-      picture: 'https://nsec.app/favicon.ico',
-      name: 'Nsec.app',
-      about:
-        'Store keys safely without a browser extension! Nsec.app is a non-custodial web app that can be connected to Nostr apps and provide restricted access to your keys.',
-      nip05: '_@nsec.app',
-      website: 'https://nsec.app',
-      domain: 'nsec.app'
-    } as BunkerProfile
-  ]
 
   const connectBunkerError =
     'We could not connect to a NIP-46 bunker with that url, are you sure it is set up correctly?'
@@ -367,37 +354,6 @@
     reset()
   }
 
-  async function handleOpenCreate(ev: MouseEvent) {
-    ev.preventDefault()
-    creating = true
-
-    if (providers.length > 0 && providers[0].bunkerPointer == null) {
-      let toRemove: BunkerProfile[] = []
-      let promises: Promise<void>[] = []
-
-      for (let i = 0; i < providers.length; i++) {
-        let promise = queryBunkerProfile(providers[i].nip05).then(
-          (bp: BunkerPointer | null) => {
-            if (!bp) {
-              toRemove.push(providers[i])
-            } else {
-              providers[i].bunkerPointer = bp
-            }
-          }
-        )
-        promises.push(promise)
-      }
-
-      await Promise.all(promises)
-      for (let r = 0; r < toRemove.length; r++) {
-        let idx = providers.indexOf(toRemove[r])
-        providers.splice(idx, 1)
-      }
-
-      providers = providers
-    }
-  }
-
   async function handleErasePointer(ev: MouseEvent) {
     ev.preventDefault()
     bunkerInputValue = ''
@@ -550,6 +506,10 @@
       localStorage.setItem(lskeys.ORIGIN, origin)
       localStorage.setItem(lskeys.Y_POS, ypos.toString())
     }
+  }
+
+  function handleCreateAccount() {
+    window.location.href = `https://nstart.me?an=${currentDomain}&at=web&ac=${currentProtocol}//${currentDomain}&sfb=yes`
   }
 </script>
 
@@ -732,11 +692,9 @@
         </div>
         <button
           class="mt-4 block w-full cursor-pointer rounded border-0 px-2 py-1 text-lg text-white disabled:cursor-default disabled:bg-neutral-400 disabled:text-neutral-200 bg-{accent}-900 hover:bg-{accent}-950"
-          on:click={() => {
-            window.location.href = `https://nstart.me?an=${currentDomain}&at=web&ac=${currentProtocol}//${currentDomain}&sfb=yes`
-          }}
+          on:click={handleCreateAccount}
           disabled={awaitingCreation}
-          >Create the account »
+          >Create an account »
         </button>
         <div class="mt-6 text-center text-sm leading-3">
           Do you already have a Nostr address?<br />
@@ -802,7 +760,7 @@
               Do you need a Nostr account?<br />
               <button
                 class="cursor-pointer border-0 bg-transparent text-sm text-white underline"
-                on:click={handleOpenCreate}>Sign up now</button
+                on:click={handleCreateAccount}>Sign up now</button
               >
             {/if}
           </div>
