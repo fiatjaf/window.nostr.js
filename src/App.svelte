@@ -565,7 +565,7 @@
     <!-- Open status ################### -->
   {:else}
     <div
-      class="animate-show rounded-md bg-gradient-to-b px-8 py-8 shadow-[0_0px_30px_0px_rgba(0,0,0,0.6)] transition-all sm:w-96 from-{accent}-900 to-{accent}-700 {movingStyle}"
+      class="animate-show rounded-md bg-gradient-to-b px-8 py-8 shadow-[0_0px_30px_0px_rgba(0,0,0,0.6)] transition-all sm:w-96 bg-{accent}-800 from-{accent}-900 to-{accent}-700 {movingStyle}"
     >
       <button
         on:click={showInfo ? handleCloseInfo : handleCloseModal}
