@@ -70,7 +70,7 @@
   let takingTooLong = false
   let hasTriedToConnectButFailed = false
   let creating: boolean
-  let awaitingCreation: boolean
+  let awaitingCreation: boolean = false
   let errorMessage: string
   let showInfo = false
   let identity: null | {
