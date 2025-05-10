@@ -188,6 +188,16 @@
         if (!connecting && !connected) connectOrOpen()
         return (await bunker).nip04Decrypt(pubkey, ciphertext)
       }
+    },
+    nip44: {
+      async encrypt(pubkey: string, plaintext: string): Promise<string> {
+        if (!connecting && !connected) connectOrOpen()
+        return (await bunker).nip44Encrypt(pubkey, plaintext)
+      },
+      async decrypt(pubkey: string, ciphertext: string): Promise<string> {
+        if (!connecting && !connected) connectOrOpen()
+        return (await bunker).nip44Decrypt(pubkey, ciphertext)
+      }
     }
   }
 
