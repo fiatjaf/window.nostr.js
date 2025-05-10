@@ -198,6 +198,12 @@
         if (!connecting && !connected) connectOrOpen()
         return (await bunker).nip44Decrypt(pubkey, ciphertext)
       }
+    },
+    nip60: {
+      async signSecret(proof_secret: string): Promise<string> {
+        if (!connecting && !connected) connectOrOpen()
+        return (await bunker).nip60SignSecret(proof_secret)
+      }
     }
   }
 
