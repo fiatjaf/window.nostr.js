@@ -595,12 +595,10 @@
         <div class="m-auto w-full">
           <div class="text-center text-lg">Create a Nostr account</div>
           <div class="mt-4 text-center text-sm leading-4">
-            Now you a new window will bring you to <strong
-              >{new URL(showAuth).host}</strong
-            >
-            where the account creation will take place. If nothing happens check
-            that if your browser is blocking popups, pleaase.<br />
-            After that you will be returned to this page.
+            A new window will now open, taking you to
+            <strong>{new URL(showAuth).host}</strong>
+            where the account creation will occur. If nothing happens, ensure your browser is not blocking popups.
+            <br /> Afterward, you’ll be redirected back to this page.
           </div>
           <button
             class="mt-4 block w-full cursor-pointer rounded border-0 px-2 py-1 text-lg text-white disabled:cursor-default disabled:bg-neutral-400 disabled:text-neutral-200 bg-{accent}-900 hover:bg-{accent}-950"
@@ -613,12 +611,12 @@
         <div class="m-auto w-full">
           <div class="text-center text-lg">Login into a Nostr account</div>
           <div class="mt-4 text-center text-sm leading-4">
-            Now you a new window will bring you to <strong
+            A new window will now open, taking you to <strong
               >{new URL(showLogin).host}</strong
             >
-            where you can login and approve the permissions. If nothing happens check
-            that if your browser is blocking popups, pleaase.<br />
-            After that you will be returned to this page.
+            where you can login and approve the permissions.
+            If nothing happens, ensure your browser is not blocking popups. <br />
+            Afterward, you’ll be redirected back to this page.
           </div>
           <button
             class="mt-4 block w-full cursor-pointer rounded border-0 px-2 py-1 text-lg text-white disabled:cursor-default disabled:bg-neutral-400 disabled:text-neutral-200 bg-{accent}-900 hover:bg-{accent}-950"
@@ -633,12 +631,12 @@
             An action requires your confirmation
           </div>
           <div class="mt-4 text-center text-sm leading-4">
-            Now you a new window will bring you to <strong
+            A new window will now open, taking you to <strong
               >{new URL(showConfirmAction).host}</strong
             >
-            where you can approve the current action. If nothing happens check that
-            if your browser is blocking popups, pleaase.<br />
-            After that you will be returned to this page.
+            where you can approve the current action.
+            If nothing happens, ensure your browser is not blocking popups.<br />
+            Afterward, you’ll be redirected back to this page.
           </div>
           <button
             class="mt-4 block w-full cursor-pointer rounded border-0 px-2 py-1 text-lg text-white disabled:cursor-default disabled:bg-neutral-400 disabled:text-neutral-200 bg-{accent}-900 hover:bg-{accent}-950"
