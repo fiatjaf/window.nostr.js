@@ -81,6 +81,11 @@
     event: NostrEvent | null
   }
   let metadataSub: SubCloser | null
+  let pendingOperations: {
+    promise: Promise<any>
+    reject: (reason?: any) => void
+    settled: boolean
+  }[] = []
 
   const connectBunkerError =
     'We could not connect to a NIP-46 bunker with that url, are you sure it is set up correctly?'
@@ -162,8 +167,32 @@
   let windowNostr = {
     isWnj: true,
     async getPublicKey(): Promise<string> {
-      if (!connecting && !connected) connectOrOpen()
-      return (await bunker).getPublicKey()
+      let reject: (reason?: any) => void
+      let operation: {
+        promise: Promise<string>
+        reject: (reason?: any) => void
+        settled: boolean
+      }
+
+      const promise = new Promise<string>((resolve, rej) => {
+        reject = rej
+        ;(async () => {
+          try {
+            if (!connecting && !connected) connectOrOpen()
+            const result = await (await bunker).getPublicKey()
+            operation.settled = true
+            resolve(result)
+          } catch (error) {
+            operation.settled = true
+            rej(error)
+          }
+        })()
+      })
+
+      operation = {promise, reject: reject!, settled: false}
+      pendingOperations.push(operation)
+
+      return promise
     },
     async signEvent(event: NostrEvent): Promise<VerifiedEvent> {
       try {
@@ -278,6 +307,24 @@
         },
         set: function (v) {
           // replace the internal object we have
+
+          // Reject all pending operations with a specific error
+          const extensionError = new Error(
+            'Nostr extension took over, please retry the operation'
+          )
+
+          pendingOperations.forEach(op => {
+            if (!op.settled) {
+              try {
+                op.reject(extensionError)
+              } catch (err) {
+                // Ignore errors when rejecting
+              }
+            }
+          })
+
+          pendingOperations = []
+
           windowNostr = v
 
           // this is being set by an extension, so we vanish
@@ -597,8 +644,9 @@
           <div class="mt-4 text-center text-sm leading-4">
             A new window will now open, taking you to
             <strong>{new URL(showAuth).host}</strong>
-            where the account creation will occur. If nothing happens, ensure your browser is not blocking popups.
-            <br /> Afterward, you’ll be redirected back to this page.
+            where the account creation will occur. If nothing happens, ensure your
+            browser is not blocking popups.
+            <br /> Afterward, you'll be redirected back to this page.
           </div>
           <button
             class="mt-4 block w-full cursor-pointer rounded border-0 px-2 py-1 text-lg text-white disabled:cursor-default disabled:bg-neutral-400 disabled:text-neutral-200 bg-{accent}-900 hover:bg-{accent}-950"
@@ -614,9 +662,9 @@
             A new window will now open, taking you to <strong
               >{new URL(showLogin).host}</strong
             >
-            where you can login and approve the permissions.
-            If nothing happens, ensure your browser is not blocking popups. <br />
-            Afterward, you’ll be redirected back to this page.
+            where you can login and approve the permissions. If nothing happens,
+            ensure your browser is not blocking popups. <br />
+            Afterward, you'll be redirected back to this page.
           </div>
           <button
             class="mt-4 block w-full cursor-pointer rounded border-0 px-2 py-1 text-lg text-white disabled:cursor-default disabled:bg-neutral-400 disabled:text-neutral-200 bg-{accent}-900 hover:bg-{accent}-950"
@@ -634,9 +682,9 @@
             A new window will now open, taking you to <strong
               >{new URL(showConfirmAction).host}</strong
             >
-            where you can approve the current action.
-            If nothing happens, ensure your browser is not blocking popups.<br />
-            Afterward, you’ll be redirected back to this page.
+            where you can approve the current action. If nothing happens, ensure
+            your browser is not blocking popups.<br />
+            Afterward, you'll be redirected back to this page.
           </div>
           <button
             class="mt-4 block w-full cursor-pointer rounded border-0 px-2 py-1 text-lg text-white disabled:cursor-default disabled:bg-neutral-400 disabled:text-neutral-200 bg-{accent}-900 hover:bg-{accent}-950"
