@@ -81,11 +81,7 @@
     event: NostrEvent | null
   }
   let metadataSub: SubCloser | null
-  let pendingOperations: {
-    promise: Promise<any>
-    reject: (reason?: any) => void
-    settled: boolean
-  }[] = []
+  let pendingRejections: ((reason?: any) => void)[] = []
 
   const connectBunkerError =
     'We could not connect to a NIP-46 bunker with that url, are you sure it is set up correctly?'
@@ -167,32 +163,22 @@
   let windowNostr = {
     isWnj: true,
     async getPublicKey(): Promise<string> {
-      let reject: (reason?: any) => void
-      let operation: {
-        promise: Promise<string>
-        reject: (reason?: any) => void
-        settled: boolean
-      }
+      return new Promise<string>(async (resolve, reject) => {
+        pendingRejections.push(reject)
 
-      const promise = new Promise<string>((resolve, rej) => {
-        reject = rej
-        ;(async () => {
-          try {
-            if (!connecting && !connected) connectOrOpen()
-            const result = await (await bunker).getPublicKey()
-            operation.settled = true
-            resolve(result)
-          } catch (error) {
-            operation.settled = true
-            rej(error)
+        try {
+          if (!connecting && !connected) connectOrOpen()
+          const result = await (await bunker).getPublicKey()
+          resolve(result)
+        } catch (error) {
+          reject(error)
+        } finally {
+          const idx = pendingRejections.indexOf(reject)
+          if (idx !== -1) {
+            pendingRejections.splice(idx, 1)
           }
-        })()
+        }
       })
-
-      operation = {promise, reject: reject!, settled: false}
-      pendingOperations.push(operation)
-
-      return promise
     },
     async signEvent(event: NostrEvent): Promise<VerifiedEvent> {
       try {
@@ -306,29 +292,19 @@
           return windowNostr
         },
         set: function (v) {
-          // replace the internal object we have
-
-          // Reject all pending operations with a specific error
-          const extensionError = new Error(
-            'Nostr extension took over, please retry the operation'
-          )
-
-          pendingOperations.forEach(op => {
-            if (!op.settled) {
-              try {
-                op.reject(extensionError)
-              } catch (err) {
-                // Ignore errors when rejecting
-              }
-            }
-          })
-
-          pendingOperations = []
-
+          // when some extension tries to set this property we replace the internal object we have
           windowNostr = v
 
           // this is being set by an extension, so we vanish
           if (!v.isWnj) win.destroyWnj()
+
+          // reject all pending operations with a specific error
+          pendingRejections.forEach(reject => {
+            reject(
+              new Error('Nostr extension took over, please retry the operation')
+            )
+          })
+          pendingRejections = []
         },
         configurable: true // this allows Object.defineProperty() to be called again
       })
