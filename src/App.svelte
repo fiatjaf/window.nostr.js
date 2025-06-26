@@ -694,8 +694,8 @@
         <div class="text-center text-lg">{t('What is that?')}</div>
         <div class="text-base leading-5">
           <p class="mb mt-4">
-            {t(
-              "This widget is created with <i>window.nostr.js</i>, a small script you can drop in any page that already uses NIP-07 and make it also work with NIP-46 automatically when the user doesn't have an extension installed."
+            {t('This widget is created with')} <i>window.nostr.js</i>{t(
+              ", a small script you can drop in any page that already uses NIP-07 and make it also work with NIP-46 automatically when the user doesn't have an extension installed."
             )}
             <br />
             {t(
