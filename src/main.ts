@@ -40,7 +40,8 @@ const app = new App({
     position: win.wnjParams?.position === 'bottom' ? 'bottom' : 'top',
     startHidden: win.wnjParams?.startHidden,
     compactMode: win.wnjParams?.compactMode,
-    texts: win.wnjParams?.texts || defaultTexts
+    texts: win.wnjParams?.texts || defaultTexts,
+    nstartMeLanguage: win.wnjParams?.nstartMeLanguage || 'en'
   }
 })
 

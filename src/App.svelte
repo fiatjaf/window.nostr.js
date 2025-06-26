@@ -43,6 +43,7 @@
   export let startHidden: boolean
   export let compactMode: boolean
   export let texts: Record<string, string>
+  export let nstartMeLanguage: string
 
   // Helper function to get text with fallback
   function t(key: string): string {
@@ -542,7 +543,7 @@
   }
 
   function handleCreateAccount() {
-    window.location.href = `https://nstart.me?an=${currentDomain}&at=web&ac=${currentProtocol}//${currentDomain}&sfb=yes`
+    window.location.href = `https://nstart.me/${nstartMeLanguage}/?an=${currentDomain}&at=web&ac=${currentProtocol}//${currentDomain}&sfb=yes`
   }
 </script>
 
