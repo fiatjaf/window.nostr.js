@@ -42,6 +42,17 @@
       position
   export let startHidden: boolean
   export let compactMode: boolean
+  export let texts: Record<string, string>
+
+  // Helper function to get text with fallback
+  function t(key: string): string {
+    const value = texts[key]
+    if (value) return value
+
+    console.warn(`Text not found: ${key}`)
+
+    return key
+  }
 
   const win = window as any
   const pool = new SimplePool()
@@ -83,10 +94,12 @@
   let metadataSub: SubCloser | null
   let pendingRejections: ((reason?: any) => void)[] = []
 
-  const connectBunkerError =
+  $: connectBunkerError = t(
     'We could not connect to a NIP-46 bunker with that url, are you sure it is set up correctly?'
-  const connectNip05Error =
+  )
+  $: connectNip05Error = t(
     'We were not able to connect using this address. For it to work it has to come from a NIP-46 provider.'
+  )
 
   const BASE_YPOS = 20
   export let right = 20
@@ -563,14 +576,14 @@
       <!-- Connecting view ################### -->
       {#if connecting}
         <div class="flex items-center px-2">
-          Connecting to bunker
+          {t('Connecting to bunker')}
           <Spinner />
         </div>
       {:else if !identity}
         {#if compactMode}
           <div class="w-6 text-center">N</div>
         {:else}
-          <div class="flex items-center px-2">Connect with Nostr</div>
+          <div class="flex items-center px-2">{t('Connect with Nostr')}</div>
         {/if}
       {:else if !compactMode}
         <div class="flex items-center px-2">
@@ -616,51 +629,55 @@
 
       {#if showAuth}
         <div class="m-auto w-full">
-          <div class="text-center text-lg">Create a Nostr account</div>
+          <div class="text-center text-lg">{t('Create a Nostr account')}</div>
           <div class="mt-4 text-center text-sm leading-4">
-            A new window will now open, taking you to
+            {t('A new window will now open, taking you to')}
             <strong>{new URL(showAuth).host}</strong>
-            where the account creation will occur. If nothing happens, ensure your
-            browser is not blocking popups.
-            <br /> Afterward, you'll be redirected back to this page.
+            {t(
+              'where the account creation will occur. If nothing happens, ensure your browser is not blocking popups.'
+            )}
+            <br />
+            {t("Afterward, you'll be redirected back to this page.")}
           </div>
           <button
             class="mt-4 block w-full cursor-pointer rounded border-0 px-2 py-1 text-lg text-white disabled:cursor-default disabled:bg-neutral-400 disabled:text-neutral-200 bg-{accent}-900 hover:bg-{accent}-950"
             on:click={() => openAuthURLPopup(showAuth)}
           >
-            Start account creation »
+            {t('Start account creation »')}
           </button>
         </div>
       {:else if showLogin}
         <div class="m-auto w-full">
-          <div class="text-center text-lg">Login into a Nostr account</div>
+          <div class="text-center text-lg">
+            {t('Login into a Nostr account')}
+          </div>
           <div class="mt-4 text-center text-sm leading-4">
-            A new window will now open, taking you to <strong
-              >{new URL(showLogin).host}</strong
-            >
-            where you can login and approve the permissions. If nothing happens,
-            ensure your browser is not blocking popups. <br />
-            Afterward, you'll be redirected back to this page.
+            {t('A new window will now open, taking you to')}
+            <strong>{new URL(showLogin).host}</strong>
+            {t(
+              'where you can login and approve the permissions. If nothing happens, ensure your browser is not blocking popups.'
+            )} <br />
+            {t("Afterward, you'll be redirected back to this page.")}
           </div>
           <button
             class="mt-4 block w-full cursor-pointer rounded border-0 px-2 py-1 text-lg text-white disabled:cursor-default disabled:bg-neutral-400 disabled:text-neutral-200 bg-{accent}-900 hover:bg-{accent}-950"
             on:click={() => openAuthURLPopup(showLogin)}
           >
-            Login now »
+            {t('Login now »')}
           </button>
         </div>
       {:else if showConfirmAction}
         <div class="m-auto w-full">
           <div class="text-center text-lg">
-            An action requires your confirmation
+            {t('An action requires your confirmation')}
           </div>
           <div class="mt-4 text-center text-sm leading-4">
-            A new window will now open, taking you to <strong
-              >{new URL(showConfirmAction).host}</strong
-            >
-            where you can approve the current action. If nothing happens, ensure
-            your browser is not blocking popups.<br />
-            Afterward, you'll be redirected back to this page.
+            {t('A new window will now open, taking you to')}
+            <strong>{new URL(showConfirmAction).host}</strong>
+            {t(
+              'where you can approve the current action. If nothing happens, ensure your browser is not blocking popups.'
+            )}<br />
+            {t("Afterward, you'll be redirected back to this page.")}
           </div>
           <button
             class="mt-4 block w-full cursor-pointer rounded border-0 px-2 py-1 text-lg text-white disabled:cursor-default disabled:bg-neutral-400 disabled:text-neutral-200 bg-{accent}-900 hover:bg-{accent}-950"
@@ -668,71 +685,72 @@
               openAuthURLPopup(showConfirmAction)
             }}
           >
-            Confirm action »
+            {t('Confirm action »')}
           </button>
         </div>
 
         <!-- Show info ################### -->
       {:else if showInfo}
-        <div class="text-center text-lg">What is that?</div>
+        <div class="text-center text-lg">{t('What is that?')}</div>
         <div class="text-base leading-5">
           <p class="mb mt-4">
-            This widget is created with <i>window.nostr.js</i>, a small script
-            you can drop in any page that already uses NIP-07 and make it also
-            work with NIP-46 automatically when the user doesn't have an
-            extension installed.
+            {t(
+              "This widget is created with <i>window.nostr.js</i>, a small script you can drop in any page that already uses NIP-07 and make it also work with NIP-46 automatically when the user doesn't have an extension installed."
+            )}
             <br />
-            It adds a small floating button on the side of the window that users
-            can use to create Nostr accuonts or connect to their NIP-46 bunkers.
+            {t(
+              'It adds a small floating button on the side of the window that users can use to create Nostr accuonts or connect to their NIP-46 bunkers.'
+            )}
           </p>
           <p class="mt-4">
-            This tool is opensource, get the code from the <a
+            {t('This tool is opensource, get the code from the')}
+            <a
               target="_blank"
               class="underline"
               href="https://github.com/fiatjaf/window.nostr.js"
-              >project's page</a
+              >{t("project's page")}</a
             >.
           </p>
           <p class="mt-4">
-            You don't know what Nostr is?
+            {t("You don't know what Nostr is?")}
             <a target="_blank" class="underline" href="https://www.nostr.com"
-              >Learn more</a
+              >{t('Learn more')}</a
             >.
           </p>
         </div>
 
         <!-- Create account view ################### -->
       {:else if creating}
-        <div class="text-center text-lg">Create a Nostr account</div>
+        <div class="text-center text-lg">{t('Create a Nostr account')}</div>
         <div class="mt-4 text-base leading-5">
-          To use this Nostr app you need a profile. The following button opens a
-          wizard that help you to create your keypair and safely manage it in a
-          few steps. Are you ready?
+          {t(
+            'To use this Nostr app you need a profile. The following button opens a wizard that help you to create your keypair and safely manage it in a few steps. Are you ready?'
+          )}
         </div>
         <button
           class="mt-4 block w-full cursor-pointer rounded border-0 px-2 py-1 text-lg text-white disabled:cursor-default disabled:bg-neutral-400 disabled:text-neutral-200 bg-{accent}-900 hover:bg-{accent}-950"
           on:click={handleCreateAccount}
           disabled={awaitingCreation}
-          >Create an account »
+          >{t('Create an account »')}
         </button>
         <div class="mt-6 text-center text-sm leading-3">
-          Do you already have a Nostr address?<br />
+          {t('Do you already have a Nostr address?')}<br />
           <button
             class="cursor-pointer border-0 bg-transparent text-sm text-white underline"
-            on:click={handleOpenLogin}>Login now</button
+            on:click={handleOpenLogin}>{t('Login now')}</button
           >
         </div>
 
         <!-- Login view ################### -->
       {:else if !identity}
         <div class="text-center text-lg">
-          How do you want to connect to Nostr?
+          {t('How do you want to connect to Nostr?')}
         </div>
         <form class="mb-1 mt-4 flex flex-col" on:submit={handleConnect}>
           <!-- svelte-ignore a11y-autofocus -->
           <input
             class="box-border w-full rounded px-2 py-1 text-lg text-neutral-800 outline-none"
-            placeholder="user@provider or bunker://..."
+            placeholder={t('user@provider or bunker://...')}
             bind:this={bunkerInput}
             bind:value={bunkerInputValue}
             autofocus
@@ -751,18 +769,19 @@
             disabled={!bunkerInputValueIsGood || connecting}
           >
             {#if connecting}
-              Connecting to bunker
+              {t('Connecting to bunker')}
               <Spinner />
             {:else}
-              Connect »
+              {t('Connect »')}
             {/if}
           </button>
           {#if connecting && takingTooLong}
             <div class="mt-6 text-center text-sm leading-3">
-              Waiting too much?
+              {t('Waiting too much?')}
               <button
                 class="cursor-pointer border-0 bg-transparent text-sm text-white underline"
-                on:click={handleAbortConnection}>Cancel the connection</button
+                on:click={handleAbortConnection}
+                >{t('Cancel the connection')}</button
               >
             </div>
           {/if}
@@ -770,16 +789,16 @@
         {#if !connecting}
           <div class="mt-6 text-center text-sm leading-3">
             {#if hasTriedToConnectButFailed}
-              Is this bunker provider broken?<br />
+              {t('Is this bunker provider broken?')}<br />
               <button
                 class="cursor-pointer border-0 bg-transparent text-sm text-white underline"
-                on:click={handleErasePointer}>Clear it</button
+                on:click={handleErasePointer}>{t('Clear it')}</button
               >
             {:else}
-              Do you need a Nostr account?<br />
+              {t('Do you need a Nostr account?')}<br />
               <button
                 class="cursor-pointer border-0 bg-transparent text-sm text-white underline"
-                on:click={handleCreateAccount}>Sign up now</button
+                on:click={handleCreateAccount}>{t('Sign up now')}</button
               >
             {/if}
           </div>
@@ -788,7 +807,7 @@
         <!-- Connected view ################### -->
       {:else}
         <div class="text-center">
-          <div class="mb-4 text-sm">You are connected to Nostr as</div>
+          <div class="mb-4 text-sm">{t('You are connected to Nostr as')}</div>
           <a
             target="_blank"
             href={'https://nosta.me/' + identity.npub}
@@ -817,10 +836,10 @@
         </div>
         <button
           class="my-2 mt-6 block w-full cursor-pointer rounded border-0 px-2 py-1 text-lg text-white bg-{accent}-900 hover:bg-{accent}-950"
-          on:click={handleDisconnect}>Disconnect</button
+          on:click={handleDisconnect}>{t('Disconnect')}</button
         >
         <div class="mt-6 block break-all text-center text-sm">
-          This webpage is using the public key:<br />
+          {t('This webpage is using the public key:')}<br />
           {getPublicKey(clientSecret)}
         </div>
       {/if}

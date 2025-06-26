@@ -1,5 +1,6 @@
 import styles from './app.css?inline'
 import App from './App.svelte'
+import defaultTexts from './texts.json'
 
 // To customize the widget add this code before the <script src='...' inclusion
 // --- --- --- --- --- --- --- --- ---
@@ -38,7 +39,8 @@ const app = new App({
     accent: win.wnjParams?.accent || 'cyan',
     position: win.wnjParams?.position === 'bottom' ? 'bottom' : 'top',
     startHidden: win.wnjParams?.startHidden,
-    compactMode: win.wnjParams?.compactMode
+    compactMode: win.wnjParams?.compactMode,
+    texts: win.wnjParams?.texts || defaultTexts
   }
 })
 
