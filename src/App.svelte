@@ -268,8 +268,12 @@
       )
       bunkerPointer = bunker.bp
       localStorage.setItem(lskeys.BUNKER_POINTER, JSON.stringify(bunkerPointer))
+      nostrLogin = true
+      connected = true
       resolveBunker(bunker)
-      identify()
+      await flushPendingCalls()
+      await identify()
+      close()
     } catch (err) {
       console.warn('nostrconnect:// QR code handling failed:', err)
     } finally {
